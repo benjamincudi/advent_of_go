@@ -1,9 +1,11 @@
 package a2022
 
 import (
-	"github.com/gocarina/gocsv"
+	"bufio"
+	"io"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 func day1() []int {
@@ -16,23 +18,24 @@ func day1() []int {
 	if err != nil {
 		panic(err)
 	}
-	var elfSnacks []Calories
-	if err := gocsv.UnmarshalWithoutHeaders(inputReader, &elfSnacks); err != nil {
-		panic(err)
-	}
+	r := bufio.NewReader(inputReader)
+	line := ""
+	line, err = r.ReadString('\n')
+
 	var elfTotals []int
 	currentTotal := 0
-	for _, snack := range elfSnacks {
-		if snack.Cal != "" {
-			if cal, err := strconv.Atoi(snack.Cal); err != nil {
+	for err != io.EOF {
+		if line != "\n" {
+			if cal, err := strconv.Atoi(strings.TrimSuffix(line, "\n")); err != nil {
 				panic(err)
 			} else {
 				currentTotal += cal
 			}
-			continue
+		} else {
+			elfTotals = append(elfTotals, currentTotal)
+			currentTotal = 0
 		}
-		elfTotals = append(elfTotals, currentTotal)
-		currentTotal = 0
+		line, err = r.ReadString('\n')
 	}
 	elfTotals = append(elfTotals, currentTotal)
 	sort.Sort(sort.Reverse(sort.IntSlice(elfTotals)))
