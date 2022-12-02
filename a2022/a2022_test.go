@@ -1,4 +1,4 @@
-package advent
+package a2022
 
 import (
 	"bytes"
