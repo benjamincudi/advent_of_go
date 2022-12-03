@@ -9,11 +9,11 @@ import (
 )
 
 type rucksack struct {
-	compartment1, compartment2 []string
+	c1, c2 []string
 }
 
 func (r rucksack) allItems() []string {
-	all := append(r.compartment1, r.compartment2...)
+	all := append(r.c1, r.c2...)
 	sort.Strings(all)
 	return all
 }
@@ -34,40 +34,35 @@ func newRucksack(s string) (rucksack, error) {
 }
 
 func (r rucksack) getOverlappingItems() map[string]int {
-	c1 := make([]string, len(r.compartment1))
-	copy(c1, r.compartment1)
-	c2 := make([]string, len(r.compartment2))
-	copy(c2, r.compartment2)
-
 	overlap := map[string]int{}
-	for len(c1) > 0 && len(c2) > 0 {
-		if c1[0] != c2[0] {
-			if c1[0] < c2[0] {
-				if len(c1) == 1 {
+	for len(r.c1) > 0 && len(r.c2) > 0 {
+		if r.c1[0] != r.c2[0] {
+			if r.c1[0] < r.c2[0] {
+				if len(r.c1) == 1 {
 					break
 				}
-				c1 = c1[1:]
+				r.c1 = r.c1[1:]
 			} else {
-				if len(c2) == 1 {
+				if len(r.c2) == 1 {
 					break
 				}
-				c2 = c2[1:]
+				r.c2 = r.c2[1:]
 			}
 			continue
 		}
-		match := c1[0]
+		match := r.c1[0]
 		count := 0
-		addAndCut := func(compartment []string) []string {
-			s := strings.Join(compartment, "")
+		addAndCut := func(c []string) []string {
+			s := strings.Join(c, "")
 			i := strings.LastIndex(s, match) + 1
 			count += i
-			if i == len(compartment) {
+			if i == len(c) {
 				return []string{}
 			}
-			return compartment[i:]
+			return c[i:]
 		}
-		c1 = addAndCut(c1)
-		c2 = addAndCut(c2)
+		r.c1 = addAndCut(r.c1)
+		r.c2 = addAndCut(r.c2)
 		overlap[match] = count
 	}
 	return overlap
@@ -84,10 +79,11 @@ func intersectOverlaps(o1, o2 map[string]int) map[string]int {
 }
 
 func scoreOverlap(o map[string]int) int {
-	values := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	// _ takes the 0 index so that index is directly score
+	values := "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	score := 0
 	for letter := range o {
-		score += strings.Index(values, letter) + 1
+		score += strings.Index(values, letter)
 	}
 	return score
 }
