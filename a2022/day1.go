@@ -2,42 +2,68 @@ package a2022
 
 import (
 	"bufio"
+	"fmt"
+	"github.com/gocarina/gocsv"
 	"io"
 	"sort"
-	"strconv"
 	"strings"
 )
 
-func day1() []int {
+type preserveEmptyLineReader struct {
+	r *bufio.Reader
+}
+
+func (p preserveEmptyLineReader) Read() ([]string, error) {
+	var snacks []string
+	var s string
+	var err error
+	for s, err = p.r.ReadString('\n'); err != io.EOF; s, err = p.r.ReadString('\n') {
+		if err != nil {
+			return nil, err
+		}
+		// Empty line means we should stop reading, we're done with current elf
+		if s == "\n" {
+			break
+		}
+		snacks = append(snacks, strings.TrimSuffix(s, "\n"))
+	}
+	return []string{fmt.Sprintf("[%s]", strings.Join(snacks, ","))}, err
+}
+func (p preserveEmptyLineReader) ReadAll() ([][]string, error) {
+	var all [][]string
+	for s, err := p.Read(); err != io.EOF; {
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, s)
+		s, err = p.Read()
+	}
+	return all, nil
+}
+
+func day1(r io.Reader) []int {
 	type Calories struct {
-		Cal      string `csv:"lmao"`
-		NotThere string `cav:"wrong"`
+		Cal []int
 	}
 
-	inputReader, err := inputs.Open("inputs-2022/day1.txt")
-	if err != nil {
+	var elves []Calories
+
+	gocsv.SetCSVReader(func(in io.Reader) gocsv.CSVReader {
+		return preserveEmptyLineReader{bufio.NewReader(in)}
+	})
+	if err := gocsv.UnmarshalWithoutHeaders(r, &elves); err != nil {
 		panic(err)
 	}
-	r := bufio.NewReader(inputReader)
-	line := ""
-	line, err = r.ReadString('\n')
 
 	var elfTotals []int
-	currentTotal := 0
-	for err != io.EOF {
-		if line != "\n" {
-			if cal, err := strconv.Atoi(strings.TrimSuffix(line, "\n")); err != nil {
-				panic(err)
-			} else {
-				currentTotal += cal
-			}
-		} else {
-			elfTotals = append(elfTotals, currentTotal)
-			currentTotal = 0
+	for _, elf := range elves {
+		currentTotal := 0
+		for _, snack := range elf.Cal {
+			currentTotal += snack
 		}
-		line, err = r.ReadString('\n')
+		elfTotals = append(elfTotals, currentTotal)
 	}
-	elfTotals = append(elfTotals, currentTotal)
 	sort.Sort(sort.Reverse(sort.IntSlice(elfTotals)))
+	// max: 71924, totalTop3: 210406
 	return elfTotals[0:3]
 }
