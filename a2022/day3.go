@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"io"
-	"sort"
 	"strings"
 )
 
@@ -13,9 +12,7 @@ type rucksack struct {
 }
 
 func (r rucksack) allItems() []string {
-	all := append(r.c1, r.c2...)
-	sort.Strings(all)
-	return all
+	return append(r.c1, r.c2...)
 }
 
 func newRucksack(s string) (rucksack, error) {
@@ -28,42 +25,25 @@ func newRucksack(s string) (rucksack, error) {
 	if len(c1) != len(c2) {
 		return rucksack{}, errors.New("idiot math on slice splitting")
 	}
-	sort.Strings(c1)
-	sort.Strings(c2)
 	return rucksack{c1, c2}, nil
+}
+
+func contentsMap(c []string) map[string]int {
+	m := map[string]int{}
+	for _, letter := range c {
+		m[letter] = m[letter] + 1
+	}
+	return m
 }
 
 func (r rucksack) getOverlappingItems() map[string]int {
 	overlap := map[string]int{}
-	for len(r.c1) > 0 && len(r.c2) > 0 {
-		if r.c1[0] != r.c2[0] {
-			if r.c1[0] < r.c2[0] {
-				if len(r.c1) == 1 {
-					break
-				}
-				r.c1 = r.c1[1:]
-			} else {
-				if len(r.c2) == 1 {
-					break
-				}
-				r.c2 = r.c2[1:]
-			}
-			continue
+	c1 := contentsMap(r.c1)
+	c2 := contentsMap(r.c2)
+	for match, count1 := range c1 {
+		if count2, ok := c2[match]; ok {
+			overlap[match] = count1 + count2
 		}
-		match := r.c1[0]
-		count := 0
-		addAndCut := func(c []string) []string {
-			s := strings.Join(c, "")
-			i := strings.LastIndex(s, match) + 1
-			count += i
-			if i == len(c) {
-				return []string{}
-			}
-			return c[i:]
-		}
-		r.c1 = addAndCut(r.c1)
-		r.c2 = addAndCut(r.c2)
-		overlap[match] = count
 	}
 	return overlap
 }
