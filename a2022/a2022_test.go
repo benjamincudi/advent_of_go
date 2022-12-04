@@ -86,3 +86,27 @@ CrZsJsPPZsGzwwsLwLmpwMDw
 		t.Errorf("expected group score 70, got %d", group)
 	}
 }
+
+func Test_day4(t *testing.T) {
+	b := bytes.NewReader([]byte(`2-4,6-8
+2-3,4-5
+5-7,7-9
+2-8,3-7
+6-6,4-6
+2-6,4-8`))
+	if fullOverlap, anyOverlap, err := day4(b); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	} else if fullOverlap != 2 {
+		t.Errorf("expected 2 overlapping fullOverlap, got %d", fullOverlap)
+	} else if anyOverlap != 4 {
+		t.Errorf("expected 4 with any overlap, got %d", anyOverlap)
+	}
+	input := mustOpen(t, "inputs-2022/day4.txt")
+	if fullOverlap, anyOverlap, err := day4(input); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	} else if fullOverlap != 441 {
+		t.Errorf("expected 441 overlapping fullOverlap, got %d", fullOverlap)
+	} else if anyOverlap != 861 {
+		t.Errorf("expected 861 with any overlap, got %d", anyOverlap)
+	}
+}
