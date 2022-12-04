@@ -43,12 +43,14 @@ type elfPairs struct {
 	A, B intRange
 }
 
-func (p elfPairs) fullyOverlap() bool {
-	return p.A.contains(p.B) || p.B.contains(p.A)
+var boolToInt = map[bool]int{true: 1}
+
+func (p elfPairs) fullyOverlap() int {
+	return boolToInt[p.A.contains(p.B) || p.B.contains(p.A)]
 }
 
-func (p elfPairs) anyOverlap() bool {
-	return p.A.overlaps(p.B) || p.B.overlaps(p.A)
+func (p elfPairs) anyOverlap() int {
+	return boolToInt[p.A.overlaps(p.B) || p.B.overlaps(p.A)]
 }
 
 func day4(in io.Reader) (int, int, error) {
@@ -58,12 +60,8 @@ func day4(in io.Reader) (int, int, error) {
 	}
 	fullyOverlap, anyOverlap := 0, 0
 	for _, pair := range pairs {
-		if pair.fullyOverlap() {
-			fullyOverlap += 1
-		}
-		if pair.anyOverlap() {
-			anyOverlap += 1
-		}
+		fullyOverlap += pair.fullyOverlap()
+		anyOverlap += pair.anyOverlap()
 	}
 	return fullyOverlap, anyOverlap, nil
 }
