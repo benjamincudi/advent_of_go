@@ -9,19 +9,19 @@ import (
 	"strings"
 )
 
-type IntRange struct {
+type intRange struct {
 	min, max int
 }
 
-func (i *IntRange) contains(j IntRange) bool {
+func (i *intRange) contains(j intRange) bool {
 	return i.min <= j.min && i.max >= j.max
 }
 
-func (i *IntRange) overlaps(j IntRange) bool {
+func (i *intRange) overlaps(j intRange) bool {
 	return i.min <= j.min && j.min <= i.max
 }
 
-func (i *IntRange) UnmarshalCSV(s string) error {
+func (i *intRange) UnmarshalCSV(s string) error {
 	bounds := strings.Split(s, "-")
 	if len(bounds) != 2 {
 		return errors.New(fmt.Sprintf("unexpected range input: %s", s))
@@ -39,7 +39,7 @@ func (i *IntRange) UnmarshalCSV(s string) error {
 }
 
 type elfPairs struct {
-	A, B IntRange
+	A, B intRange
 }
 
 func (p elfPairs) fullyOverlap() bool {
@@ -55,8 +55,7 @@ func day4(in io.Reader) (int, int, error) {
 	if err := gocsv.UnmarshalWithoutHeaders(in, &pairs); err != nil {
 		return 0, 0, err
 	}
-	fullyOverlap := 0
-	anyOverlap := 0
+	fullyOverlap, anyOverlap := 0, 0
 	for _, pair := range pairs {
 		if pair.fullyOverlap() {
 			fullyOverlap += 1
