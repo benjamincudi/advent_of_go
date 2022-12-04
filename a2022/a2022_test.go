@@ -2,7 +2,6 @@ package a2022
 
 import (
 	"bytes"
-	"fmt"
 	"io/fs"
 	"testing"
 )
@@ -35,24 +34,24 @@ func Test_day2(t *testing.T) {
 B X
 C Z
 `))
-	if day2(b, true) != 15 {
-		fmt.Printf("control case should be 15")
-		t.Fail()
+	if v := day2(b, true); v != 15 {
+		t.Errorf("control case as plays should be 15, got %d", v)
 	}
 
-	inputReader := mustOpen(t, "inputs-2022/day2.txt")
-	fmt.Printf("score as plays: %d\n", day2(inputReader, true))
+	if v := day2(mustOpen(t, "inputs-2022/day2.txt"), true); v != 13565 {
+		t.Errorf("personal input as plays should be 13565, got %d", v)
+	}
 
 	b = bytes.NewReader([]byte(`A Y
 B X
 C Z
 `))
-	if day2(b, false) != 12 {
-		fmt.Printf("control case should be 12")
-		t.Fail()
+	if v := day2(b, false); v != 12 {
+		t.Errorf("control case as outcomes should be 12, got %d", v)
 	}
-	inputReader = mustOpen(t, "inputs-2022/day2.txt")
-	fmt.Printf("score as outcome: %d\n", day2(inputReader, false))
+	if v := day2(mustOpen(t, "inputs-2022/day2.txt"), false); v != 12424 {
+		t.Errorf("personal input as outcomes should be 12424, got %d", v)
+	}
 }
 
 func Test_day3(t *testing.T) {
