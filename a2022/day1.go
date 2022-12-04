@@ -32,12 +32,11 @@ func (p preserveEmptyLineReader) Read() ([]string, error) {
 }
 func (p preserveEmptyLineReader) ReadAll() ([][]string, error) {
 	var all [][]string
-	for s, err := p.Read(); err != io.EOF; {
+	for s, err := p.Read(); err != io.EOF; s, err = p.Read() {
 		if err != nil {
 			return nil, err
 		}
 		all = append(all, s)
-		s, err = p.Read()
 	}
 	return all, nil
 }
