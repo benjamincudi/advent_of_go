@@ -1,31 +1,29 @@
 package a2022
 
 import (
-	"bufio"
 	"errors"
 	"io"
 	"strings"
+
+	"github.com/gocarina/gocsv"
 )
 
 type rucksack struct {
 	c1, c2 []string
 }
 
-func (r rucksack) allItems() []string {
-	return append(r.c1, r.c2...)
-}
-
-func newRucksack(s string) (rucksack, error) {
+func (r *rucksack) UnmarshalCSV(s string) error {
 	contents := strings.Split(s, "")
 	if len(contents)%2 != 0 {
-		return rucksack{}, errors.New("invalid rucksack has odd-count of items")
+		return errors.New("invalid rucksack has odd-count of items")
 	}
 	half := len(contents) / 2
-	c1, c2 := contents[0:half], contents[half:]
-	if len(c1) != len(c2) {
-		return rucksack{}, errors.New("idiot math on slice splitting")
-	}
-	return rucksack{c1, c2}, nil
+	r.c1, r.c2 = contents[0:half], contents[half:]
+	return nil
+}
+
+func (r *rucksack) allItems() []string {
+	return append(r.c1, r.c2...)
 }
 
 func contentsMap(c []string) map[string]int {
@@ -36,7 +34,7 @@ func contentsMap(c []string) map[string]int {
 	return m
 }
 
-func (r rucksack) getOverlappingItems() map[string]int {
+func (r *rucksack) getOverlappingItems() map[string]int {
 	overlap := map[string]int{}
 	c1 := contentsMap(r.c1)
 	c2 := contentsMap(r.c2)
@@ -69,28 +67,23 @@ func scoreOverlap(o map[string]int) int {
 }
 
 func day3(in io.Reader) (int, int, error) {
-	r := bufio.NewReader(in)
-	var sacks []rucksack
-	for s, err := r.ReadString('\n'); err != io.EOF; s, err = r.ReadString('\n') {
-		if err != nil {
-			return 0, 0, err
-		}
-		sack, err := newRucksack(strings.TrimSuffix(s, "\n"))
-		if err != nil {
-			return 0, 0, err
-		}
-		sacks = append(sacks, sack)
+	type sack struct {
+		R rucksack
+	}
+	var sacks []sack
+	if err := gocsv.UnmarshalWithoutHeaders(in, &sacks); err != nil {
+		return 0, 0, err
 	}
 
 	sackScore := 0
-	for _, sack := range sacks {
-		sackScore += scoreOverlap(sack.getOverlappingItems())
+	for _, s := range sacks {
+		sackScore += scoreOverlap(s.R.getOverlappingItems())
 	}
 
 	groupScore := 0
 	for i := 0; i < len(sacks); i += 3 {
-		fauxSack1 := rucksack{sacks[i].allItems(), sacks[i+1].allItems()}
-		fauxSack2 := rucksack{sacks[i+1].allItems(), sacks[i+2].allItems()}
+		fauxSack1 := rucksack{sacks[i].R.allItems(), sacks[i+1].R.allItems()}
+		fauxSack2 := rucksack{sacks[i+1].R.allItems(), sacks[i+2].R.allItems()}
 		groupScore += scoreOverlap(intersectOverlaps(fauxSack1.getOverlappingItems(), fauxSack2.getOverlappingItems()))
 	}
 	return sackScore, groupScore, nil
