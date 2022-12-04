@@ -49,10 +49,7 @@ func day1(r io.Reader) []int {
 
 	var elves []Calories
 
-	gocsv.SetCSVReader(func(in io.Reader) gocsv.CSVReader {
-		return preserveEmptyLineReader{bufio.NewReader(in)}
-	})
-	if err := gocsv.UnmarshalWithoutHeaders(r, &elves); err != nil {
+	if err := gocsv.UnmarshalCSVWithoutHeaders(preserveEmptyLineReader{bufio.NewReader(r)}, &elves); err != nil {
 		panic(err)
 	}
 
