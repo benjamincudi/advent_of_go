@@ -43,11 +43,11 @@ func (p preserveEmptyLineReader) ReadAll() ([][]string, error) {
 }
 
 func day1(r io.Reader) []int {
-	type Calories struct {
+	type calories struct {
 		Cal []int
 	}
 
-	var elves []Calories
+	var elves []calories
 
 	if err := gocsv.UnmarshalCSVWithoutHeaders(preserveEmptyLineReader{bufio.NewReader(r)}, &elves); err != nil {
 		panic(err)

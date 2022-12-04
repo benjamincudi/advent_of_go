@@ -9,12 +9,12 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-type RPSPlay int
+type rpsPlay int
 
 const (
-	RPSRock RPSPlay = iota
-	RPSPaper
-	RPSScissor
+	rpsRock rpsPlay = iota
+	rpsPaper
+	rpsScissor
 )
 const (
 	lose int = 0
@@ -22,76 +22,75 @@ const (
 	win      = 6
 )
 
-type RPSHand struct {
-	play RPSPlay
+type rpsHand struct {
+	play rpsPlay
 }
 
-func (r *RPSHand) Score() int {
+func (r *rpsHand) score() int {
 	return int(r.play) + 1
 }
 
-func (r *RPSHand) UnmarshalCSV(s string) error {
+func (r *rpsHand) UnmarshalCSV(s string) error {
 	switch s {
 	case "A", "X":
-		r.play = RPSRock
+		r.play = rpsRock
 	case "B", "Y":
-		r.play = RPSPaper
+		r.play = rpsPaper
 	case "C", "Z":
-		r.play = RPSScissor
+		r.play = rpsScissor
 	default:
 		return errors.New(fmt.Sprintf("Unknown input: %s", s))
 	}
 	return nil
 }
 
-type RPSRound struct {
-	Opp RPSHand `csv:"lmao"`
-	Me  RPSHand `cav:"notthere"`
+type rpsRound struct {
+	Opp, Me rpsHand
 }
 
-func (r RPSRound) Result(isPlay bool) int {
-	keyBeats := map[RPSHand]RPSHand{
-		{RPSRock}:    {RPSScissor},
-		{RPSScissor}: {RPSPaper},
-		{RPSPaper}:   {RPSRock},
+func (r rpsRound) result(isPlay bool) int {
+	keyBeats := map[rpsHand]rpsHand{
+		{rpsRock}:    {rpsScissor},
+		{rpsScissor}: {rpsPaper},
+		{rpsPaper}:   {rpsRock},
 	}
-	keyLoses := map[RPSHand]RPSHand{
-		{RPSScissor}: {RPSRock},
-		{RPSPaper}:   {RPSScissor},
-		{RPSRock}:    {RPSPaper},
+	keyLoses := map[rpsHand]rpsHand{
+		{rpsScissor}: {rpsRock},
+		{rpsPaper}:   {rpsScissor},
+		{rpsRock}:    {rpsPaper},
 	}
 	if isPlay {
 		switch true {
 		case r.Opp == r.Me:
-			return draw + r.Me.Score()
+			return draw + r.Me.score()
 		case keyBeats[r.Me] == r.Opp:
-			return win + r.Me.Score()
+			return win + r.Me.score()
 		default:
-			return lose + r.Me.Score()
+			return lose + r.Me.score()
 		}
 	}
 	switch r.Me.play {
-	case RPSRock: // Rock == lose
+	case rpsRock: // Rock == lose
 		shouldPlay := keyBeats[r.Opp]
-		return lose + shouldPlay.Score()
-	case RPSPaper: // Paper == draw
-		return draw + r.Opp.Score()
+		return lose + shouldPlay.score()
+	case rpsPaper: // Paper == draw
+		return draw + r.Opp.score()
 	default: // Scissor = win
 		shouldPlay := keyLoses[r.Opp]
-		return win + shouldPlay.Score()
+		return win + shouldPlay.score()
 	}
 }
 func day2(in io.Reader, isPlay bool) int {
 	r := csv.NewReader(in)
 	r.Comma = ' '
-	var gameRounds []RPSRound
+	var gameRounds []rpsRound
 	if err := gocsv.UnmarshalCSVWithoutHeaders(r, &gameRounds); err != nil {
 		panic(err)
 	}
 
 	total := 0
 	for _, r := range gameRounds {
-		score := r.Result(isPlay)
+		score := r.result(isPlay)
 		total += score
 	}
 	return total
