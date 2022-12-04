@@ -3,10 +3,11 @@ package a2022
 import (
 	"bufio"
 	"fmt"
-	"github.com/gocarina/gocsv"
 	"io"
 	"sort"
 	"strings"
+
+	"github.com/gocarina/gocsv"
 )
 
 type preserveEmptyLineReader struct {

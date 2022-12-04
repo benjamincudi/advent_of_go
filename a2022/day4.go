@@ -3,10 +3,11 @@ package a2022
 import (
 	"errors"
 	"fmt"
-	"github.com/gocarina/gocsv"
 	"io"
 	"strconv"
 	"strings"
+
+	"github.com/gocarina/gocsv"
 )
 
 type intRange struct {

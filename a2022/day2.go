@@ -4,8 +4,9 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"github.com/gocarina/gocsv"
 	"io"
+
+	"github.com/gocarina/gocsv"
 )
 
 type RPSPlay int
