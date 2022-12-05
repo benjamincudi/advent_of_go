@@ -12,6 +12,9 @@ import (
 )
 
 var instructionNumbers = regexp.MustCompile("\\d+")
+var crates = regexp.MustCompile("(\\[\\w]|\\s{3})\\s")
+var emptyCrate = regexp.MustCompile("\\s+")
+var innerCrate = regexp.MustCompile("\\[(?P<value>\\w)]")
 var columnLabelRegex = regexp.MustCompile("((\\s\\d\\s)\\s?)+")
 
 type crateStack struct {
@@ -66,12 +69,12 @@ func day5(in io.Reader) (string, string) {
 			panic(err)
 		}
 		var row []string
-		for i := 0; i < len(s); i += 4 {
-			if s[i+1:i+2] == " " {
+		for _, matchGroup := range crates.FindAllStringSubmatch(s, -1) {
+			if emptyCrate.MatchString(matchGroup[1]) {
 				row = append(row, "-")
 				continue
 			}
-			row = append(row, s[i+1:i+2])
+			row = append(row, innerCrate.FindStringSubmatch(matchGroup[1])[1])
 		}
 		crateRows = append(crateRows, row)
 	}
