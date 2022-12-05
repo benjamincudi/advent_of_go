@@ -11,11 +11,13 @@ import (
 	"github.com/gocarina/gocsv"
 )
 
-var instructionNumbers = regexp.MustCompile("\\d+")
-var crates = regexp.MustCompile("(\\[\\w]|\\s{3})\\s")
-var emptyCrate = regexp.MustCompile("\\s+")
-var innerCrate = regexp.MustCompile("\\[(?P<value>\\w)]")
-var columnLabelRegex = regexp.MustCompile("((\\s\\d\\s)\\s?)+")
+var (
+	instructionNumbers = regexp.MustCompile("\\d+")                // rip numbers out of "move X from Y to Z"
+	crates             = regexp.MustCompile("(\\[\\w]|\\s{3})\\s") // split rows of text into chunks of crates
+	emptyCrate         = regexp.MustCompile("\\s+")                // check for all whitespace, which in this usage means "no crate"
+	innerCrate         = regexp.MustCompile("\\[(?P<value>\\w)]")  // pull the crate letter out of a match
+	columnLabelRegex   = regexp.MustCompile("((\\s\\d\\s)\\s?)+")  // match the row that labels each crate stack with a number
+)
 
 type crateStack struct {
 	crates []string
