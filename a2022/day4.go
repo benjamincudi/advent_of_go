@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 
 	"github.com/gocarina/gocsv"
@@ -27,15 +26,7 @@ func (i *intRange) UnmarshalCSV(s string) error {
 	if len(bounds) != 2 {
 		return errors.New(fmt.Sprintf("unexpected range input: %s", s))
 	}
-	min, err := strconv.Atoi(bounds[0])
-	if err != nil {
-		return err
-	}
-	max, err := strconv.Atoi(bounds[1])
-	if err != nil {
-		return err
-	}
-	i.min, i.max = min, max
+	i.min, i.max = mustInt(bounds[0]), mustInt(bounds[1])
 	return nil
 }
 

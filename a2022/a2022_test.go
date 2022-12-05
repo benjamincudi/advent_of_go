@@ -109,3 +109,30 @@ func Test_day4(t *testing.T) {
 		t.Errorf("expected 861 with any overlap, got %d", anyOverlap)
 	}
 }
+
+func Test_day5(t *testing.T) {
+	b := bytes.NewReader([]byte(`    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2`))
+	part1, part2 := day5(b)
+	if part1 != "CMZ" {
+		t.Errorf("expected control part1 to be CMZ, got %s", part1)
+	}
+	if part2 != "MCD" {
+		t.Errorf("expected control part2 to be MCD, got %s", part2)
+	}
+
+	part1, part2 = day5(mustOpen(t, "inputs-2022/day5.txt"))
+	if part1 != "FZCMJCRHZ" {
+		t.Errorf("expected personal input part1 to be FZCMJCRHZ, got %s", part1)
+	}
+	if part2 != "JSDHQMZGF" {
+		t.Errorf("expected personal input part2 to be JSDHQMZGF, got %s", part2)
+	}
+}
