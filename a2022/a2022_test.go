@@ -136,3 +136,37 @@ move 1 from 1 to 2`))
 		t.Errorf("expected personal input part2 to be JSDHQMZGF, got %s", part2)
 	}
 }
+
+func Test_day6(t *testing.T) {
+	if r := day6(bytes.NewReader([]byte(`mjqjpqmgbljsphdztnvjfqwrcgsmlb`))); r.startOfPacket != 7 {
+		t.Errorf("expected start-of-packet 7, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 19 {
+		t.Errorf("expected start-of-message 19, got %d", r.startOfMessage)
+	}
+	if r := day6(bytes.NewReader([]byte(`bvwbjplbgvbhsrlpgdmjqwftvncz`))); r.startOfPacket != 5 {
+		t.Errorf("expected start-of-packet 5, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 23 {
+		t.Errorf("expected start-of-message 23, got %d", r.startOfMessage)
+	}
+	if r := day6(bytes.NewReader([]byte(`nppdvjthqldpwncqszvftbrmjlhg`))); r.startOfPacket != 6 {
+		t.Errorf("expected start-of-packet 6, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 23 {
+		t.Errorf("expected start-of-message 23, got %d", r.startOfMessage)
+	}
+	if r := day6(bytes.NewReader([]byte(`nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg`))); r.startOfPacket != 10 {
+		t.Errorf("expected start-of-packet 10, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 29 {
+		t.Errorf("expected start-of-message 29, got %d", r.startOfMessage)
+	}
+	if r := day6(bytes.NewReader([]byte(`zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw`))); r.startOfPacket != 11 {
+		t.Errorf("expected start-of-packet 11, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 26 {
+		t.Errorf("expected start-of-message 26, got %d", r.startOfMessage)
+	}
+
+	if r := day6(mustOpen(t, "inputs-2022/day6.txt")); r.startOfPacket != 1598 {
+		t.Errorf("expected start-of-packet 1598, got %d", r.startOfPacket)
+	} else if r.startOfMessage != 2414 {
+		t.Errorf("expected start-of-message 2414, got %d", r.startOfMessage)
+	}
+}
