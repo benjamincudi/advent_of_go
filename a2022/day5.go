@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	instructionNumbers = regexp.MustCompile("\\d+")                // rip numbers out of "move X from Y to Z"
-	crates             = regexp.MustCompile("(\\[\\w]|\\s{3})\\s") // split rows of text into chunks of crates
-	emptyCrate         = regexp.MustCompile("\\s+")                // check for all whitespace, which in this usage means "no crate"
-	innerCrate         = regexp.MustCompile("\\[(?P<value>\\w)]")  // pull the crate letter out of a match
-	columnLabelRegex   = regexp.MustCompile("((\\s\\d\\s)\\s?)+")  // match the row that labels each crate stack with a number
+	instructionNumbers = regexp.MustCompile(`\d+`)              // rip numbers out of "move X from Y to Z"
+	crates             = regexp.MustCompile(`(\[\w]|\s{3})\s`)  // split rows of text into chunks of crates
+	emptyCrate         = regexp.MustCompile(`\s+`)              // check for all whitespace, which in this usage means "no crate"
+	innerCrate         = regexp.MustCompile(`\[(?P<value>\w)]`) // pull the crate letter out of a match
+	columnLabelRegex   = regexp.MustCompile(`((\s\d\s)\s?)+`)   // match the row that labels each crate stack with a number
 )
 
 type crateStack struct {
