@@ -32,7 +32,7 @@ func day6(in io.Reader) res {
 			break
 		}
 	}
-	for i := 14; i < len(d); i++ {
+	for i := maxInt(sop+10, 14); i < len(d); i++ {
 		if !anyOverlap(d[i-14 : i]) {
 			som = i
 			break

@@ -19,8 +19,18 @@ func mustInt(s string) int {
 
 // Reverse the given slice
 //
-// Mutates the input, but also returns it so it can be inlined to function calls
+// Mutates the input, but also returns it, so it can be inlined to function calls
 func reverse[E any](in []E) []E {
 	sort.SliceStable(in, func(i, j int) bool { return i > j })
 	return in
+}
+
+func maxInt[E ~int](vals ...E) E {
+	max := vals[0]
+	for _, v := range vals {
+		if v > max {
+			max = v
+		}
+	}
+	return max
 }
