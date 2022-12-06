@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"regexp"
-	"sort"
 
 	"github.com/gocarina/gocsv"
 )
@@ -24,17 +23,14 @@ type crateStack struct {
 }
 
 func (c *crateStack) Add(crates ...string) {
-	c.crates = append(
-		// copy the crates to avoid slice reference shenanigans
-		append(make([]string, 0, len(crates)+len(c.crates)), crates...),
-		c.crates...)
+	c.crates = append(crates, c.crates...)
 }
 func (c *crateStack) Take(num int) []string {
 	crate := c.crates[0:num]
-	c.crates = append([]string{}, c.crates[num:]...)
+	c.crates = append(make([]string, 0, len(c.crates)-num), c.crates[num:]...)
 	return crate
 }
-func (c crateStack) Top() string {
+func (c *crateStack) Top() string {
 	return c.crates[0]
 }
 
@@ -63,7 +59,7 @@ func initStacks(crateRows [][]string) []crateStack {
 	return crateStacks
 }
 
-func day5(in io.Reader) (string, string) {
+func day5(in io.Reader) (part1, part2 string) {
 	r := bufio.NewReader(in)
 	var crateRows [][]string
 	for s, err := r.ReadString('\n'); !columnLabelRegex.MatchString(s) && err != io.EOF; s, err = r.ReadString('\n') {
@@ -82,35 +78,23 @@ func day5(in io.Reader) (string, string) {
 	}
 
 	// Reverse the rows so we're building from bottom-up
-	sort.SliceStable(crateRows, func(i, j int) bool {
-		return i > j
-	})
+	reverse(crateRows)
 	// generally pointless struct so that we can unmarshal instructions
-	type insRow struct {
-		I instruction
-	}
+	type insRow struct{ I instruction }
 	var ins []insRow
 	if err := gocsv.UnmarshalWithoutHeaders(r, &ins); err != nil {
 		panic(err)
 	}
-	crateStacks := initStacks(crateRows)
+	crateStacks1, crateStacks2 := initStacks(crateRows), initStacks(crateRows)
 	for _, row := range ins {
-		for i := 0; i < row.I.count; i++ {
-			crateStacks[row.I.to].Add(crateStacks[row.I.from].Take(1)...)
-		}
+		// "one at a time" ordering is just the reverse of all-at-once
+		crateStacks1[row.I.to].Add(reverse(crateStacks1[row.I.from].Take(row.I.count))...)
+		crateStacks2[row.I.to].Add(crateStacks2[row.I.from].Take(row.I.count)...)
 	}
-	part1 := ""
-	for _, c := range crateStacks {
-		part1 += c.Top()
+	for i := 0; i < len(crateStacks1); i++ {
+		part1 += crateStacks1[i].Top()
+		part2 += crateStacks2[i].Top()
 	}
 
-	crateStacks = initStacks(crateRows)
-	for _, row := range ins {
-		crateStacks[row.I.to].Add(crateStacks[row.I.from].Take(row.I.count)...)
-	}
-	part2 := ""
-	for _, c := range crateStacks {
-		part2 += c.Top()
-	}
 	return part1, part2
 }
