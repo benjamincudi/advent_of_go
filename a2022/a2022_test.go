@@ -8,6 +8,7 @@ import (
 )
 
 func mustOpen(t *testing.T, name string) fs.File {
+	t.Helper()
 	inputReader, err := inputs.Open(name)
 	if err != nil {
 		t.Fatalf("%v", err)

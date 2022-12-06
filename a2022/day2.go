@@ -2,7 +2,6 @@ package a2022
 
 import (
 	"encoding/csv"
-	"errors"
 	"fmt"
 	"io"
 
@@ -18,8 +17,8 @@ const (
 )
 const (
 	lose int = 0
-	draw     = 3
-	win      = 6
+	draw int = 3
+	win  int = 6
 )
 
 type rpsHand struct {
@@ -39,7 +38,7 @@ func (r *rpsHand) UnmarshalCSV(s string) error {
 	case "C", "Z":
 		r.play = rpsScissor
 	default:
-		return errors.New(fmt.Sprintf("Unknown input: %s", s))
+		return fmt.Errorf("unknown input: %s", s)
 	}
 	return nil
 }

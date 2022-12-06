@@ -2,7 +2,6 @@ package a2022
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -41,7 +40,7 @@ type instruction struct {
 func (i *instruction) UnmarshalCSV(s string) error {
 	matches := instructionNumbers.FindAllString(s, -1)
 	if len(matches) != 3 {
-		return errors.New(fmt.Sprintf("did not match 3 numbers in %s", s))
+		return fmt.Errorf("did not match 3 numbers in %s", s)
 	}
 	i.count, i.from, i.to = mustInt(matches[0]), mustInt(matches[1])-1, mustInt(matches[2])-1
 	return nil

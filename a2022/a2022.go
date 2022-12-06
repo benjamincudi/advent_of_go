@@ -25,9 +25,9 @@ func reverse[E any](in []E) []E {
 	return in
 }
 
-func maxInt[E ~int](vals ...E) E {
-	max := vals[0]
-	for _, v := range vals {
+func maxInt[E ~int](values ...E) E {
+	max := values[0]
+	for _, v := range values {
 		if v > max {
 			max = v
 		}

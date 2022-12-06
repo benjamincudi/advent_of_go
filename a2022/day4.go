@@ -1,7 +1,6 @@
 package a2022
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -24,7 +23,7 @@ func (i *intRange) overlaps(j intRange) bool {
 func (i *intRange) UnmarshalCSV(s string) error {
 	bounds := strings.Split(s, "-")
 	if len(bounds) != 2 {
-		return errors.New(fmt.Sprintf("unexpected range input: %s", s))
+		return fmt.Errorf("unexpected range input: %s", s)
 	}
 	i.min, i.max = mustInt(bounds[0]), mustInt(bounds[1])
 	return nil

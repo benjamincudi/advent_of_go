@@ -61,6 +61,5 @@ func day1(r io.Reader) []int {
 		elfTotals = append(elfTotals, currentTotal)
 	}
 	sort.Sort(sort.Reverse(sort.IntSlice(elfTotals)))
-	// max: 71924, totalTop3: 210406
 	return elfTotals[0:3]
 }
