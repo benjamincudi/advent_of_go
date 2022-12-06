@@ -2,6 +2,7 @@ package a2022
 
 import (
 	"bytes"
+	"io"
 	"io/fs"
 	"testing"
 )
@@ -15,42 +16,69 @@ func mustOpen(t *testing.T, name string) fs.File {
 }
 
 func Test_day1(t *testing.T) {
-	inputReader := mustOpen(t, "inputs-2022/day1.txt")
-	top3 := day1(inputReader)
-	sum := 0
-	for _, c := range top3 {
-		sum += c
+	b := bytes.NewReader([]byte(`1000
+2000
+3000
+
+4000
+
+5000
+6000
+
+7000
+8000
+9000
+
+10000
+
+`))
+	cases := []struct {
+		name       string
+		in         io.Reader
+		top1, top3 int
+	}{
+		{"control", b, 24000, 45000},
+		{"personal", mustOpen(t, "inputs-2022/day1.txt"), 71924, 210406},
 	}
-	if top3[0] != 71924 {
-		t.Errorf("expected max 71924, got %d", top3[0])
-	}
-	if sum != 210406 {
-		t.Errorf("expected top 3 sum of 210406, got %d", sum)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			top3 := day1(c.in)
+			sum := 0
+			for _, cal := range top3 {
+				sum += cal
+			}
+			if top3[0] != c.top1 {
+				t.Errorf("expected max %d, got %d", c.top1, top3[0])
+			}
+			if sum != c.top3 {
+				t.Errorf("expected top 3 sum of %d, got %d", c.top3, sum)
+			}
+		})
 	}
 }
 
 func Test_day2(t *testing.T) {
-	b := bytes.NewReader([]byte(`A Y
+	controlInput := []byte(`A Y
 B X
 C Z
-`))
-	if v := day2(b, true); v != 15 {
-		t.Errorf("control case as plays should be 15, got %d", v)
+`)
+	cases := []struct {
+		name                string
+		in                  io.Reader
+		secondColumnAsPlays bool
+		outcome             int
+	}{
+		{"control case - as plays", bytes.NewReader(controlInput), true, 15},
+		{"control case - as outcomes", bytes.NewReader(controlInput), false, 12},
+		{"personal input - as plays", mustOpen(t, "inputs-2022/day2.txt"), true, 13565},
+		{"personal input - as outcomes", mustOpen(t, "inputs-2022/day2.txt"), false, 12424},
 	}
-
-	if v := day2(mustOpen(t, "inputs-2022/day2.txt"), true); v != 13565 {
-		t.Errorf("personal input as plays should be 13565, got %d", v)
-	}
-
-	b = bytes.NewReader([]byte(`A Y
-B X
-C Z
-`))
-	if v := day2(b, false); v != 12 {
-		t.Errorf("control case as outcomes should be 12, got %d", v)
-	}
-	if v := day2(mustOpen(t, "inputs-2022/day2.txt"), false); v != 12424 {
-		t.Errorf("personal input as outcomes should be 12424, got %d", v)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if v := day2(c.in, c.secondColumnAsPlays); v != c.outcome {
+				t.Errorf("expected %d, got %d", c.outcome, v)
+			}
+		})
 	}
 }
 
@@ -62,27 +90,27 @@ wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
 ttgJtRGJQctTZtZT
 CrZsJsPPZsGzwwsLwLmpwMDw
 `))
-	sacks, group, err := day3(b)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
+	cases := []struct {
+		name         string
+		in           io.Reader
+		sacks, group int
+	}{
+		{"control case", b, 157, 70},
+		{"personal input", mustOpen(t, "inputs-2022/day3.txt"), 7967, 2716},
 	}
-	if sacks != 157 {
-		t.Errorf("expected 157, got %d", sacks)
-	}
-	if group != 70 {
-		t.Errorf("expected group score 70, got %d", group)
-	}
-
-	input := mustOpen(t, "inputs-2022/day3.txt")
-	sacks, group, err = day3(input)
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if sacks != 7967 {
-		t.Errorf("expected 157, got %d", sacks)
-	}
-	if group != 2716 {
-		t.Errorf("expected group score 70, got %d", group)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			sacks, group, err := day3(c.in)
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+			}
+			if sacks != c.sacks {
+				t.Errorf("expected %d, got %d", c.sacks, sacks)
+			}
+			if group != c.group {
+				t.Errorf("expected group score %d, got %d", c.group, group)
+			}
+		})
 	}
 }
 
@@ -93,20 +121,24 @@ func Test_day4(t *testing.T) {
 2-8,3-7
 6-6,4-6
 2-6,4-8`))
-	if fullOverlap, anyOverlap, err := day4(b); err != nil {
-		t.Errorf("unexpected error: %v", err)
-	} else if fullOverlap != 2 {
-		t.Errorf("expected 2 overlapping fullOverlap, got %d", fullOverlap)
-	} else if anyOverlap != 4 {
-		t.Errorf("expected 4 with any overlap, got %d", anyOverlap)
+	cases := []struct {
+		name                              string
+		in                                io.Reader
+		fullOverlapCount, anyOverlapCount int
+	}{
+		{"control case", b, 2, 4},
+		{"personal input", mustOpen(t, "inputs-2022/day4.txt"), 441, 861},
 	}
-	input := mustOpen(t, "inputs-2022/day4.txt")
-	if fullOverlap, anyOverlap, err := day4(input); err != nil {
-		t.Errorf("unexpected error: %v", err)
-	} else if fullOverlap != 441 {
-		t.Errorf("expected 441 overlapping fullOverlap, got %d", fullOverlap)
-	} else if anyOverlap != 861 {
-		t.Errorf("expected 861 with any overlap, got %d", anyOverlap)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if fullOverlapCount, anyOverlapCount, err := day4(c.in); err != nil {
+				t.Errorf("unexpected error: %v", err)
+			} else if fullOverlapCount != c.fullOverlapCount {
+				t.Errorf("expected %d overlapping fullOverlap, got %d", c.fullOverlapCount, fullOverlapCount)
+			} else if anyOverlapCount != c.anyOverlapCount {
+				t.Errorf("expected %d with any overlap, got %d", c.anyOverlapCount, anyOverlapCount)
+			}
+		})
 	}
 }
 
@@ -120,53 +152,47 @@ move 1 from 2 to 1
 move 3 from 1 to 3
 move 2 from 2 to 1
 move 1 from 1 to 2`))
-	part1, part2 := day5(b)
-	if part1 != "CMZ" {
-		t.Errorf("expected control part1 to be CMZ, got %s", part1)
+	cases := []struct {
+		name         string
+		in           io.Reader
+		part1, part2 string
+	}{
+		{"control case", b, "CMZ", "MCD"},
+		{"personal input", mustOpen(t, "inputs-2022/day5.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
 	}
-	if part2 != "MCD" {
-		t.Errorf("expected control part2 to be MCD, got %s", part2)
-	}
-
-	part1, part2 = day5(mustOpen(t, "inputs-2022/day5.txt"))
-	if part1 != "FZCMJCRHZ" {
-		t.Errorf("expected personal input part1 to be FZCMJCRHZ, got %s", part1)
-	}
-	if part2 != "JSDHQMZGF" {
-		t.Errorf("expected personal input part2 to be JSDHQMZGF, got %s", part2)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			part1, part2 := day5(c.in)
+			if part1 != c.part1 {
+				t.Errorf("expected part1 to be %s, got %s", c.part1, part1)
+			}
+			if part2 != c.part2 {
+				t.Errorf("expected part2 to be %s, got %s", c.part2, part2)
+			}
+		})
 	}
 }
 
 func Test_day6(t *testing.T) {
-	if r := day6(bytes.NewReader([]byte(`mjqjpqmgbljsphdztnvjfqwrcgsmlb`))); r.startOfPacket != 7 {
-		t.Errorf("expected start-of-packet 7, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 19 {
-		t.Errorf("expected start-of-message 19, got %d", r.startOfMessage)
+	cases := []struct {
+		name                          string
+		in                            io.Reader
+		startOfPacket, startOfMessage int
+	}{
+		{"control case 1", bytes.NewReader([]byte(`mjqjpqmgbljsphdztnvjfqwrcgsmlb`)), 7, 19},
+		{"control case 2", bytes.NewReader([]byte(`bvwbjplbgvbhsrlpgdmjqwftvncz`)), 5, 23},
+		{"control case 3", bytes.NewReader([]byte(`nppdvjthqldpwncqszvftbrmjlhg`)), 6, 23},
+		{"control case 4", bytes.NewReader([]byte(`nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg`)), 10, 29},
+		{"control case 5", bytes.NewReader([]byte(`zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw`)), 11, 26},
+		{"personal input", mustOpen(t, "inputs-2022/day6.txt"), 1598, 2414},
 	}
-	if r := day6(bytes.NewReader([]byte(`bvwbjplbgvbhsrlpgdmjqwftvncz`))); r.startOfPacket != 5 {
-		t.Errorf("expected start-of-packet 5, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 23 {
-		t.Errorf("expected start-of-message 23, got %d", r.startOfMessage)
-	}
-	if r := day6(bytes.NewReader([]byte(`nppdvjthqldpwncqszvftbrmjlhg`))); r.startOfPacket != 6 {
-		t.Errorf("expected start-of-packet 6, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 23 {
-		t.Errorf("expected start-of-message 23, got %d", r.startOfMessage)
-	}
-	if r := day6(bytes.NewReader([]byte(`nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg`))); r.startOfPacket != 10 {
-		t.Errorf("expected start-of-packet 10, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 29 {
-		t.Errorf("expected start-of-message 29, got %d", r.startOfMessage)
-	}
-	if r := day6(bytes.NewReader([]byte(`zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw`))); r.startOfPacket != 11 {
-		t.Errorf("expected start-of-packet 11, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 26 {
-		t.Errorf("expected start-of-message 26, got %d", r.startOfMessage)
-	}
-
-	if r := day6(mustOpen(t, "inputs-2022/day6.txt")); r.startOfPacket != 1598 {
-		t.Errorf("expected start-of-packet 1598, got %d", r.startOfPacket)
-	} else if r.startOfMessage != 2414 {
-		t.Errorf("expected start-of-message 2414, got %d", r.startOfMessage)
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			if r := day6(c.in); r.startOfPacket != c.startOfPacket {
+				t.Errorf("expected start-of-packet %d, got %d", c.startOfPacket, r.startOfPacket)
+			} else if r.startOfMessage != c.startOfMessage {
+				t.Errorf("expected start-of-message %d, got %d", c.startOfMessage, r.startOfMessage)
+			}
+		})
 	}
 }
