@@ -26,13 +26,13 @@ func day6(in io.Reader) res {
 	r.Scan()
 	d := strings.Split(r.Text(), "")
 	sop, som := -1, -1
-	for i := 4; i < len(d); i++ {
+	for i := 4; i <= len(d); i++ {
 		if !anyOverlap(d[i-4 : i]) {
 			sop = i
 			break
 		}
 	}
-	for i := maxInt(sop+10, 14); i < len(d); i++ {
+	for i := maxInt(sop+10, 14); i <= len(d); i++ {
 		if !anyOverlap(d[i-14 : i]) {
 			som = i
 			break
