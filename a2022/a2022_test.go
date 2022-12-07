@@ -1,15 +1,17 @@
 package a2022
 
 import (
-	"bytes"
+	"bufio"
+	"fmt"
 	"io"
 	"io/fs"
+	"strings"
 	"testing"
 )
 
 func mustOpen(t *testing.T, name string) fs.File {
 	t.Helper()
-	inputReader, err := inputs.Open(name)
+	inputReader, err := inputs.Open(fmt.Sprintf("inputs-2022/%s", name))
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
@@ -17,29 +19,13 @@ func mustOpen(t *testing.T, name string) fs.File {
 }
 
 func Test_day1(t *testing.T) {
-	b := bytes.NewReader([]byte(`1000
-2000
-3000
-
-4000
-
-5000
-6000
-
-7000
-8000
-9000
-
-10000
-
-`))
 	cases := []struct {
 		name       string
 		in         io.Reader
 		top1, top3 int
 	}{
-		{"control", b, 24000, 45000},
-		{"personal", mustOpen(t, "inputs-2022/day1.txt"), 71924, 210406},
+		{"control", mustOpen(t, "control1.txt"), 24000, 45000},
+		{"personal", mustOpen(t, "day1.txt"), 71924, 210406},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -59,20 +45,16 @@ func Test_day1(t *testing.T) {
 }
 
 func Test_day2(t *testing.T) {
-	controlInput := []byte(`A Y
-B X
-C Z
-`)
 	cases := []struct {
 		name                string
 		in                  io.Reader
 		secondColumnAsPlays bool
 		outcome             int
 	}{
-		{"control case - as plays", bytes.NewReader(controlInput), true, 15},
-		{"control case - as outcomes", bytes.NewReader(controlInput), false, 12},
-		{"personal input - as plays", mustOpen(t, "inputs-2022/day2.txt"), true, 13565},
-		{"personal input - as outcomes", mustOpen(t, "inputs-2022/day2.txt"), false, 12424},
+		{"control case - as plays", mustOpen(t, "control2.txt"), true, 15},
+		{"control case - as outcomes", mustOpen(t, "control2.txt"), false, 12},
+		{"personal input - as plays", mustOpen(t, "day2.txt"), true, 13565},
+		{"personal input - as outcomes", mustOpen(t, "day2.txt"), false, 12424},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -84,20 +66,13 @@ C Z
 }
 
 func Test_day3(t *testing.T) {
-	b := bytes.NewReader([]byte(`vJrwpWtwJgWrhcsFMMfFFhFp
-jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
-PmmdzqPrVvPwwTWBwg
-wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
-ttgJtRGJQctTZtZT
-CrZsJsPPZsGzwwsLwLmpwMDw
-`))
 	cases := []struct {
 		name         string
 		in           io.Reader
 		sacks, group int
 	}{
-		{"control case", b, 157, 70},
-		{"personal input", mustOpen(t, "inputs-2022/day3.txt"), 7967, 2716},
+		{"control case", mustOpen(t, "control3.txt"), 157, 70},
+		{"personal input", mustOpen(t, "day3.txt"), 7967, 2716},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -116,19 +91,13 @@ CrZsJsPPZsGzwwsLwLmpwMDw
 }
 
 func Test_day4(t *testing.T) {
-	b := bytes.NewReader([]byte(`2-4,6-8
-2-3,4-5
-5-7,7-9
-2-8,3-7
-6-6,4-6
-2-6,4-8`))
 	cases := []struct {
 		name                              string
 		in                                io.Reader
 		fullOverlapCount, anyOverlapCount int
 	}{
-		{"control case", b, 2, 4},
-		{"personal input", mustOpen(t, "inputs-2022/day4.txt"), 441, 861},
+		{"control case", mustOpen(t, "control4.txt"), 2, 4},
+		{"personal input", mustOpen(t, "day4.txt"), 441, 861},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -144,22 +113,13 @@ func Test_day4(t *testing.T) {
 }
 
 func Test_day5(t *testing.T) {
-	b := bytes.NewReader([]byte(`    [D]    
-[N] [C]    
-[Z] [M] [P]
- 1   2   3 
-
-move 1 from 2 to 1
-move 3 from 1 to 3
-move 2 from 2 to 1
-move 1 from 1 to 2`))
 	cases := []struct {
 		name         string
 		in           io.Reader
 		part1, part2 string
 	}{
-		{"control case", b, "CMZ", "MCD"},
-		{"personal input", mustOpen(t, "inputs-2022/day5.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
+		{"control case", mustOpen(t, "control5.txt"), "CMZ", "MCD"},
+		{"personal input", mustOpen(t, "day5.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
@@ -175,17 +135,22 @@ move 1 from 1 to 2`))
 }
 
 func Test_day6(t *testing.T) {
+	r := bufio.NewScanner(mustOpen(t, "control6.txt"))
+	var control []string
+	for r.Scan() {
+		control = append(control, r.Text())
+	}
 	cases := []struct {
 		name                          string
 		in                            io.Reader
 		startOfPacket, startOfMessage int
 	}{
-		{"control case 1", bytes.NewReader([]byte(`mjqjpqmgbljsphdztnvjfqwrcgsmlb`)), 7, 19},
-		{"control case 2", bytes.NewReader([]byte(`bvwbjplbgvbhsrlpgdmjqwftvncz`)), 5, 23},
-		{"control case 3", bytes.NewReader([]byte(`nppdvjthqldpwncqszvftbrmjlhg`)), 6, 23},
-		{"control case 4", bytes.NewReader([]byte(`nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg`)), 10, 29},
-		{"control case 5", bytes.NewReader([]byte(`zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw`)), 11, 26},
-		{"personal input", mustOpen(t, "inputs-2022/day6.txt"), 1598, 2414},
+		{"control case 1", strings.NewReader(control[0]), 7, 19},
+		{"control case 2", strings.NewReader(control[1]), 5, 23},
+		{"control case 3", strings.NewReader(control[2]), 6, 23},
+		{"control case 4", strings.NewReader(control[3]), 10, 29},
+		{"control case 5", strings.NewReader(control[4]), 11, 26},
+		{"personal input", mustOpen(t, "day6.txt"), 1598, 2414},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
