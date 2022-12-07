@@ -19,7 +19,7 @@ func mustOpen(t *testing.T, name string) fs.File {
 }
 
 func Test_day1(t *testing.T) {
-	cases := []struct {
+	testCases := []struct {
 		name       string
 		in         io.Reader
 		top1, top3 int
@@ -27,25 +27,25 @@ func Test_day1(t *testing.T) {
 		{"control", mustOpen(t, "control1.txt"), 24000, 45000},
 		{"personal", mustOpen(t, "day1.txt"), 71924, 210406},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			top3 := day1(c.in)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			top3 := day1(tc.in)
 			sum := 0
 			for _, cal := range top3 {
 				sum += cal
 			}
-			if top3[0] != c.top1 {
-				t.Errorf("expected max %d, got %d", c.top1, top3[0])
+			if top3[0] != tc.top1 {
+				t.Errorf("expected max %d, got %d", tc.top1, top3[0])
 			}
-			if sum != c.top3 {
-				t.Errorf("expected top 3 sum of %d, got %d", c.top3, sum)
+			if sum != tc.top3 {
+				t.Errorf("expected top 3 sum of %d, got %d", tc.top3, sum)
 			}
 		})
 	}
 }
 
 func Test_day2(t *testing.T) {
-	cases := []struct {
+	testCases := []struct {
 		name                string
 		in                  io.Reader
 		secondColumnAsPlays bool
@@ -56,17 +56,17 @@ func Test_day2(t *testing.T) {
 		{"personal input - as plays", mustOpen(t, "day2.txt"), true, 13565},
 		{"personal input - as outcomes", mustOpen(t, "day2.txt"), false, 12424},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if v := day2(c.in, c.secondColumnAsPlays); v != c.outcome {
-				t.Errorf("expected %d, got %d", c.outcome, v)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if v := day2(tc.in, tc.secondColumnAsPlays); v != tc.outcome {
+				t.Errorf("expected %d, got %d", tc.outcome, v)
 			}
 		})
 	}
 }
 
 func Test_day3(t *testing.T) {
-	cases := []struct {
+	testCases := []struct {
 		name         string
 		in           io.Reader
 		sacks, group int
@@ -74,24 +74,24 @@ func Test_day3(t *testing.T) {
 		{"control case", mustOpen(t, "control3.txt"), 157, 70},
 		{"personal input", mustOpen(t, "day3.txt"), 7967, 2716},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			sacks, group, err := day3(c.in)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sacks, group, err := day3(tc.in)
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
-			if sacks != c.sacks {
-				t.Errorf("expected %d, got %d", c.sacks, sacks)
+			if sacks != tc.sacks {
+				t.Errorf("expected %d, got %d", tc.sacks, sacks)
 			}
-			if group != c.group {
-				t.Errorf("expected group score %d, got %d", c.group, group)
+			if group != tc.group {
+				t.Errorf("expected group score %d, got %d", tc.group, group)
 			}
 		})
 	}
 }
 
 func Test_day4(t *testing.T) {
-	cases := []struct {
+	testCases := []struct {
 		name                              string
 		in                                io.Reader
 		fullOverlapCount, anyOverlapCount int
@@ -99,21 +99,21 @@ func Test_day4(t *testing.T) {
 		{"control case", mustOpen(t, "control4.txt"), 2, 4},
 		{"personal input", mustOpen(t, "day4.txt"), 441, 861},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if fullOverlapCount, anyOverlapCount, err := day4(c.in); err != nil {
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if fullOverlapCount, anyOverlapCount, err := day4(tc.in); err != nil {
 				t.Errorf("unexpected error: %v", err)
-			} else if fullOverlapCount != c.fullOverlapCount {
-				t.Errorf("expected %d overlapping fullOverlap, got %d", c.fullOverlapCount, fullOverlapCount)
-			} else if anyOverlapCount != c.anyOverlapCount {
-				t.Errorf("expected %d with any overlap, got %d", c.anyOverlapCount, anyOverlapCount)
+			} else if fullOverlapCount != tc.fullOverlapCount {
+				t.Errorf("expected %d overlapping fullOverlap, got %d", tc.fullOverlapCount, fullOverlapCount)
+			} else if anyOverlapCount != tc.anyOverlapCount {
+				t.Errorf("expected %d with any overlap, got %d", tc.anyOverlapCount, anyOverlapCount)
 			}
 		})
 	}
 }
 
 func Test_day5(t *testing.T) {
-	cases := []struct {
+	testCases := []struct {
 		name         string
 		in           io.Reader
 		part1, part2 string
@@ -121,14 +121,14 @@ func Test_day5(t *testing.T) {
 		{"control case", mustOpen(t, "control5.txt"), "CMZ", "MCD"},
 		{"personal input", mustOpen(t, "day5.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			part1, part2 := day5(c.in)
-			if part1 != c.part1 {
-				t.Errorf("expected part1 to be %s, got %s", c.part1, part1)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			part1, part2 := day5(tc.in)
+			if part1 != tc.part1 {
+				t.Errorf("expected part1 to be %s, got %s", tc.part1, part1)
 			}
-			if part2 != c.part2 {
-				t.Errorf("expected part2 to be %s, got %s", c.part2, part2)
+			if part2 != tc.part2 {
+				t.Errorf("expected part2 to be %s, got %s", tc.part2, part2)
 			}
 		})
 	}
@@ -140,7 +140,7 @@ func Test_day6(t *testing.T) {
 	for r.Scan() {
 		control = append(control, r.Text())
 	}
-	cases := []struct {
+	testCases := []struct {
 		name                          string
 		in                            io.Reader
 		startOfPacket, startOfMessage int
@@ -152,12 +152,12 @@ func Test_day6(t *testing.T) {
 		{"control case 5", strings.NewReader(control[4]), 11, 26},
 		{"personal input", mustOpen(t, "day6.txt"), 1598, 2414},
 	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			if r := day6(c.in); r.startOfPacket != c.startOfPacket {
-				t.Errorf("expected start-of-packet %d, got %d", c.startOfPacket, r.startOfPacket)
-			} else if r.startOfMessage != c.startOfMessage {
-				t.Errorf("expected start-of-message %d, got %d", c.startOfMessage, r.startOfMessage)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if r := day6(tc.in); r.startOfPacket != tc.startOfPacket {
+				t.Errorf("expected start-of-packet %d, got %d", tc.startOfPacket, r.startOfPacket)
+			} else if r.startOfMessage != tc.startOfMessage {
+				t.Errorf("expected start-of-message %d, got %d", tc.startOfMessage, r.startOfMessage)
 			}
 		})
 	}
