@@ -211,4 +211,23 @@ func Benchmark_day6(b *testing.B) {
 		}
 	})
 }
+
+func Test_day7(t *testing.T) {
+	testCases := []struct {
+		name                         string
+		in                           io.Reader
+		sumOfSmall, smallestToDelete int
+	}{
+		{"control case", mustOpen(t, "control7.txt"), 95437, 24933642},
+		{"personal input", mustOpen(t, "day7.txt"), 1453349, 2948823},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if sum, small := day7(tc.in); sum != tc.sumOfSmall {
+				t.Errorf("expected sumOfSmall %d, got %d", tc.sumOfSmall, sum)
+			} else if small != tc.smallestToDelete {
+				t.Errorf("expected smallestToDelete %d, got %d", tc.smallestToDelete, small)
+			}
+		})
+	}
 }

@@ -34,3 +34,13 @@ func maxInt[E ~int](values ...E) E {
 	}
 	return max
 }
+
+func minInt[E ~int](values ...E) E {
+	max := values[0]
+	for _, v := range values {
+		if v < max {
+			max = v
+		}
+	}
+	return max
+}
