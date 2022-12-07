@@ -9,7 +9,12 @@ import (
 	"testing"
 )
 
-func mustOpen(t *testing.T, name string) fs.File {
+type failerHelper interface {
+	Fatalf(format string, args ...any)
+	Helper()
+}
+
+func mustOpen(t failerHelper, name string) fs.File {
 	t.Helper()
 	inputReader, err := inputs.Open(fmt.Sprintf("inputs-2022/%s", name))
 	if err != nil {
@@ -135,10 +140,10 @@ func Test_day5(t *testing.T) {
 }
 
 func Test_day6(t *testing.T) {
-	r := bufio.NewScanner(mustOpen(t, "control6.txt"))
+	reader := bufio.NewScanner(mustOpen(t, "control6.txt"))
 	var control []string
-	for r.Scan() {
-		control = append(control, r.Text())
+	for reader.Scan() {
+		control = append(control, reader.Text())
 	}
 	testCases := []struct {
 		name                          string
