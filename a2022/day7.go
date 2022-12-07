@@ -9,10 +9,10 @@ import (
 )
 
 var (
-	cmdCd   = regexp.MustCompile(`\$ cd (?P<dir>.+)\s?`)
-	cmdLs   = regexp.MustCompile(`\$ ls`)
-	objDir  = regexp.MustCompile(`dir (?P<name>\w+)`)
-	objFile = regexp.MustCompile(`(?P<size>\d+) (?P<name>.+)`)
+	cmdCd   = regexp.MustCompile(`^\$ cd (?P<dir>.+)\s?`)
+	cmdLs   = regexp.MustCompile(`^\$ ls`)
+	objDir  = regexp.MustCompile(`^dir (?P<name>\w+)`)
+	objFile = regexp.MustCompile(`^(?P<size>\d+) (?P<name>.+)`)
 )
 
 type directory struct {
