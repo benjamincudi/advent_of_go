@@ -1,3 +1,6 @@
 linters:
+  enable:
+    - gofmt
+    - goimports
   disable:
     - typecheck
