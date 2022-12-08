@@ -231,3 +231,23 @@ func Test_day7(t *testing.T) {
 		})
 	}
 }
+
+func Test_day8(t *testing.T) {
+	testCases := []struct {
+		name           string
+		in             io.Reader
+		visible, score int
+	}{
+		{"control case", mustOpen(t, "control8.txt"), 21, 8},
+		{"personal input", mustOpen(t, "day8.txt"), 1679, 536625},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if visible, score := day8(tc.in); visible != tc.visible {
+				t.Errorf("expected visible %v, got %v", tc.visible, visible)
+			} else if score != tc.score {
+				t.Errorf("expected score %d, got %d", tc.score, score)
+			}
+		})
+	}
+}

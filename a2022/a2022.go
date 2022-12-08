@@ -44,3 +44,11 @@ func minInt[E ~int](values ...E) E {
 	}
 	return max
 }
+
+func mapValue[E any, F any](in []E, getValue func(E) F) []F {
+	var ret []F
+	for _, val := range in {
+		ret = append(ret, getValue(val))
+	}
+	return ret
+}
