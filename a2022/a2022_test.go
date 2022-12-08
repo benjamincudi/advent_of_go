@@ -243,9 +243,11 @@ func Test_day8(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			if visible, score := day8(tc.in); visible != tc.visible {
+			visible, score := day8(tc.in)
+			if visible != tc.visible {
 				t.Errorf("expected visible %v, got %v", tc.visible, visible)
-			} else if score != tc.score {
+			}
+			if score != tc.score {
 				t.Errorf("expected score %d, got %d", tc.score, score)
 			}
 		})

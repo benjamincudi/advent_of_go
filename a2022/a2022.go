@@ -6,6 +6,8 @@ import (
 	"strconv"
 )
 
+const shouldLog bool = false
+
 //go:embed inputs-2022
 var inputs embed.FS
 

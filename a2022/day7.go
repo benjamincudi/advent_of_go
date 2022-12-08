@@ -89,10 +89,9 @@ func makeDir(path string, parent *directory) directory {
 }
 
 const (
-	minNeeded     int  = 30000000
-	totalDisk     int  = 70000000
-	smallDirLimit int  = 100000
-	shouldLog     bool = false
+	minNeeded     int = 30000000
+	totalDisk     int = 70000000
+	smallDirLimit int = 100000
 )
 
 func day7(in io.Reader) (int, int) {
