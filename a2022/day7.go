@@ -67,15 +67,15 @@ func (d *directory) smallestDirSatisfying(min, max int) int {
 }
 
 func (d *directory) string(pad int) string {
-	dirName := fmt.Sprintf("%s- %s (dir, total=%d)\n", strings.Repeat(" ", pad), d.path, d.totalSize)
+	dirName := fmt.Sprintf("%s- %s (dir, total=%d)", strings.Repeat(" ", pad), d.path, d.totalSize)
 	var files []string
-	for file, size := range d.files {
-		files = append(files, fmt.Sprintf("%s- %s (file, size=%d)\n", strings.Repeat(" ", pad+2), file, size))
-	}
 	for _, dir := range d.childDirs {
 		files = append(files, dir.string(pad+2))
 	}
-	return strings.Join(append([]string{dirName}, files...), "")
+	for file, size := range d.files {
+		files = append(files, fmt.Sprintf("%s- %s (file, size=%d)", strings.Repeat(" ", pad+2), file, size))
+	}
+	return strings.Join(append([]string{dirName}, files...), "\n")
 }
 
 func makeDir(path string, parent *directory) directory {
