@@ -12,6 +12,23 @@ type direction struct {
 	visible bool
 }
 
+func checkDirections(index int, rowOrCol []int) (leftOrUp, rightOrDown direction) {
+	treeHeight := rowOrCol[index]
+	leftOrUp, rightOrDown = direction{index, true}, direction{(len(rowOrCol) - 1) - index, true}
+	for i, height := range rowOrCol {
+		if height >= treeHeight {
+			if i < index {
+				leftOrUp = direction{index - i, false}
+			}
+			if i > index {
+				rightOrDown = direction{i - index, false}
+				break
+			}
+		}
+	}
+	return leftOrUp, rightOrDown
+}
+
 func day8(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
 
@@ -36,35 +53,13 @@ func day8(in io.Reader) (int, int) {
 	}
 	for i := 1; i < len(forest)-1; i++ {
 		for j := 1; j < len(forest[i])-1; j++ {
-			treeHeight := forest[i][j]
 			if shouldLog {
-				fmt.Printf("h: %d at [%d][%d]\n", treeHeight, i, j)
-			}
-			left, right := direction{j, true}, direction{maxRight - j, true}
-			for x, height := range forest[i] {
-				if height >= treeHeight {
-					if x < j {
-						left = direction{j - x, false}
-					}
-					if x > j {
-						right = direction{x - j, false}
-						break
-					}
-				}
+				fmt.Printf("h: %d at [%d][%d]\n", forest[i][j], i, j)
 			}
 
-			up, down := direction{i, true}, direction{maxDown - i, true}
-			for y := range forest {
-				if forest[y][j] >= treeHeight {
-					if y < i {
-						up = direction{i - y, false}
-					}
-					if y > i {
-						down = direction{y - i, false}
-						break
-					}
-				}
-			}
+			left, right := checkDirections(j, forest[i])
+			up, down := checkDirections(i, mapValue(forest, func(row []int) int { return row[j] }))
+
 			anyVisible := up.visible || down.visible || left.visible || right.visible
 			score := up.trees * left.trees * right.trees * down.trees
 			if shouldLog {
