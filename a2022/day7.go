@@ -79,7 +79,13 @@ func (d *directory) string(pad int) string {
 }
 
 func makeDir(path string, parent *directory) directory {
-	return directory{path: strings.ReplaceAll(path, "//", "/"), childDirs: map[string]*directory{}, files: map[string]int{}, parent: parent}
+	return directory{
+		strings.ReplaceAll(path, "//", "/"),
+		parent,
+		map[string]*directory{},
+		map[string]int{},
+		0,
+	}
 }
 
 const (

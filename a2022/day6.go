@@ -29,7 +29,7 @@ type overlapChecker struct {
 }
 
 func newOverlapChecker(l int) overlapChecker {
-	return overlapChecker{length: l, state: map[string]int{}}
+	return overlapChecker{0, l, map[string]int{}, nil}
 }
 
 func (o *overlapChecker) initFrom(src []string) error {
