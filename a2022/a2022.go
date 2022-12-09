@@ -27,6 +27,23 @@ func reverse[E any](in []E) []E {
 	return in
 }
 
+func abs[E ~int](x E) E {
+	if x < 0 {
+		return x * -1
+	}
+	return x
+}
+
+func sign[E ~int](x E) E {
+	if x < 0 {
+		return -1
+	}
+	if x > 0 {
+		return 1
+	}
+	return 0
+}
+
 func maxInt[E ~int](values ...E) E {
 	max := values[0]
 	for _, v := range values {

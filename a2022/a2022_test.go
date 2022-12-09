@@ -253,3 +253,26 @@ func Test_day8(t *testing.T) {
 		})
 	}
 }
+
+func Test_day9(t *testing.T) {
+	testCases := []struct {
+		name                          string
+		in                            io.Reader
+		tailVisited, chainTailVisited int
+	}{
+		{"control case", mustOpen(t, "control9.txt"), 13, 1},
+		{"control case 2", mustOpen(t, "control9-2.txt"), 88, 36},
+		{"personal input", mustOpen(t, "day9.txt"), 6494, 2691},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			tailVisited, chainTailVisited := day9(tc.in)
+			if tailVisited != tc.tailVisited {
+				t.Errorf("expected tailVisited %v, got %v", tc.tailVisited, tailVisited)
+			}
+			if chainTailVisited != tc.chainTailVisited {
+				t.Errorf("expected chainTailVisited %d, got %d", tc.chainTailVisited, chainTailVisited)
+			}
+		})
+	}
+}
