@@ -76,17 +76,13 @@ func day9(in io.Reader) (int, int) {
 	}
 
 	head := makeRopeKnot(0, 2)
-	for _, s := range ropeSteps {
-		for c := 0; c < s.Count; c++ {
-			head.move(s.D)
-		}
-	}
-
 	h := makeRopeKnot(0, 10)
 	for _, s := range ropeSteps {
 		for c := 0; c < s.Count; c++ {
+			head.move(s.D)
 			h.move(s.D)
 		}
 	}
+
 	return head.getTailHistoryLength(), h.getTailHistoryLength()
 }
