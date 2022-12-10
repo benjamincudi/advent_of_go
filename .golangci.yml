@@ -1,6 +1,6 @@
 linters:
   enable:
-    - gofmt
-    - goimports
+    - unparam
+    - unused
   disable:
     - typecheck
