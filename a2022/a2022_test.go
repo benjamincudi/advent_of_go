@@ -276,3 +276,53 @@ func Test_day9(t *testing.T) {
 		})
 	}
 }
+
+func Test_day10(t *testing.T) {
+	// cycle off-by-one is probably the crux of everyone's bugs
+	// if someone is struggling with this in part 2, the screen looks like this:
+	// ##..##..#..##...##.##..##..##..##..##..#
+	// ###..####..###...###...####..####..###..
+	// ##.....#####...###.....####.....##.....#
+	// ####.....##.#......#####.....####.......
+	// ###.##.....##.###......######......##.#.
+	// ###.##.......####.#........########.....
+	controlOutputScreen := `
+##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+`
+	personalOutputScreen := `
+###..#..#..##..#..#.#..#.###..####.#..#.
+#..#.#..#.#..#.#.#..#..#.#..#.#....#.#..
+#..#.#..#.#..#.##...####.###..###..##...
+###..#..#.####.#.#..#..#.#..#.#....#.#..
+#.#..#..#.#..#.#.#..#..#.#..#.#....#.#..
+#..#..##..#..#.#..#.#..#.###..####.#..#.
+`
+	testCases := []struct {
+		name   string
+		in     io.Reader
+		sum    int
+		screen string
+	}{
+		{"control case", mustOpen(t, "control10.txt"), 13140, controlOutputScreen},
+		{"personal input", mustOpen(t, "day10.txt"), 13220, personalOutputScreen},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sum, screen, err := day10(tc.in)
+			if err != nil {
+				t.Fatalf("%v", err)
+			}
+			if sum != tc.sum {
+				t.Errorf("expected %v, got %v", tc.sum, sum)
+			}
+			if screen != tc.screen {
+				t.Errorf("expected screen %s\ngot screen %s", tc.screen, screen)
+			}
+		})
+	}
+}
