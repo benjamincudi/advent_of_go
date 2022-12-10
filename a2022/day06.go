@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func anyOverlap(s []string) bool {
+func lazyOverlapCheck(s []string) bool {
 	seen := map[string]bool{}
 	for _, letter := range s {
 		if seen[letter] {
@@ -18,7 +18,7 @@ func anyOverlap(s []string) bool {
 	return false
 }
 
-type res struct {
+type day6result struct {
 	startOfPacket, startOfMessage int
 }
 
@@ -67,34 +67,34 @@ func (o *overlapChecker) done() bool {
 	return len(o.history) == o.length && o.duplicates == 0
 }
 
-func day6(in io.Reader) res {
+func day6(in io.Reader) day6result {
 	r := bufio.NewScanner(in)
 	r.Scan()
 	d := strings.Split(r.Text(), "")
 	sop, som := -1, -1
 	for i := 4; i <= len(d); i++ {
-		if !anyOverlap(d[i-4 : i]) {
+		if !lazyOverlapCheck(d[i-4 : i]) {
 			sop = i
 			break
 		}
 	}
 	// if we didn't find an answer, a longer answer can't exist
 	if sop == -1 {
-		return res{-1, -1}
+		return day6result{-1, -1}
 	}
 	for i := maxInt(sop+10, 14); i <= len(d); i++ {
-		if !anyOverlap(d[i-14 : i]) {
+		if !lazyOverlapCheck(d[i-14 : i]) {
 			som = i
 			break
 		}
 	}
-	return res{
+	return day6result{
 		startOfPacket:  sop,
 		startOfMessage: som,
 	}
 }
 
-func day6fast(in io.Reader) res {
+func day6fast(in io.Reader) day6result {
 	r := bufio.NewScanner(in)
 	r.Scan()
 	d := strings.Split(r.Text(), "")
@@ -112,7 +112,7 @@ func day6fast(in io.Reader) res {
 	}
 	// if we didn't find an answer, a longer answer can't exist
 	if sop == -1 {
-		return res{-1, -1}
+		return day6result{-1, -1}
 	}
 	somStartingI := maxInt(sop+10, 14)
 	if err := somChecker.initFrom(d[somStartingI-14 : somStartingI]); err != nil {
@@ -125,7 +125,7 @@ func day6fast(in io.Reader) res {
 			break
 		}
 	}
-	return res{
+	return day6result{
 		// answers are 1-indexed
 		startOfPacket:  sop + 1,
 		startOfMessage: som + 1,
