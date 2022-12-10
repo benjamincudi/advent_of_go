@@ -12,21 +12,19 @@ type direction struct {
 	visible bool
 }
 
-func checkDirections(index int, rowOrCol []int) (leftOrUp, rightOrDown direction) {
-	treeHeight := rowOrCol[index]
-	leftOrUp, rightOrDown = direction{index, true}, direction{(len(rowOrCol) - 1) - index, true}
-	for i, height := range rowOrCol {
-		if height >= treeHeight {
-			if i < index {
-				leftOrUp = direction{index - i, false}
-			}
-			if i > index {
-				rightOrDown = direction{i - index, false}
-				break
-			}
+func checkDirection(height int, trees []int) direction {
+	for i, h := range trees {
+		if h >= height {
+			return direction{i + 1, false}
 		}
 	}
-	return leftOrUp, rightOrDown
+	return direction{len(trees), true}
+}
+
+func checkDirections(index int, rowOrCol []int) (leftOrUp, rightOrDown direction) {
+	treeHeight := rowOrCol[index]
+	return checkDirection(treeHeight, reverse(append([]int{}, rowOrCol[:index]...))), // copy the slice so reverse doesn't mutate the forest
+		checkDirection(treeHeight, rowOrCol[index+1:])
 }
 
 func day8(in io.Reader) (int, int) {
