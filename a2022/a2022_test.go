@@ -29,8 +29,8 @@ func Test_day1(t *testing.T) {
 		in         io.Reader
 		top1, top3 int
 	}{
-		{"control", mustOpen(t, "control1.txt"), 24000, 45000},
-		{"personal", mustOpen(t, "day1.txt"), 71924, 210406},
+		{"control", mustOpen(t, "control01.txt"), 24000, 45000},
+		{"personal", mustOpen(t, "day01.txt"), 71924, 210406},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -56,10 +56,10 @@ func Test_day2(t *testing.T) {
 		secondColumnAsPlays bool
 		outcome             int
 	}{
-		{"control case - as plays", mustOpen(t, "control2.txt"), true, 15},
-		{"control case - as outcomes", mustOpen(t, "control2.txt"), false, 12},
-		{"personal input - as plays", mustOpen(t, "day2.txt"), true, 13565},
-		{"personal input - as outcomes", mustOpen(t, "day2.txt"), false, 12424},
+		{"control case - as plays", mustOpen(t, "control02.txt"), true, 15},
+		{"control case - as outcomes", mustOpen(t, "control02.txt"), false, 12},
+		{"personal input - as plays", mustOpen(t, "day02.txt"), true, 13565},
+		{"personal input - as outcomes", mustOpen(t, "day02.txt"), false, 12424},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -76,8 +76,8 @@ func Test_day3(t *testing.T) {
 		in           io.Reader
 		sacks, group int
 	}{
-		{"control case", mustOpen(t, "control3.txt"), 157, 70},
-		{"personal input", mustOpen(t, "day3.txt"), 7967, 2716},
+		{"control case", mustOpen(t, "control03.txt"), 157, 70},
+		{"personal input", mustOpen(t, "day03.txt"), 7967, 2716},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -101,8 +101,8 @@ func Test_day4(t *testing.T) {
 		in                                io.Reader
 		fullOverlapCount, anyOverlapCount int
 	}{
-		{"control case", mustOpen(t, "control4.txt"), 2, 4},
-		{"personal input", mustOpen(t, "day4.txt"), 441, 861},
+		{"control case", mustOpen(t, "control04.txt"), 2, 4},
+		{"personal input", mustOpen(t, "day04.txt"), 441, 861},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -123,8 +123,8 @@ func Test_day5(t *testing.T) {
 		in           io.Reader
 		part1, part2 string
 	}{
-		{"control case", mustOpen(t, "control5.txt"), "CMZ", "MCD"},
-		{"personal input", mustOpen(t, "day5.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
+		{"control case", mustOpen(t, "control05.txt"), "CMZ", "MCD"},
+		{"personal input", mustOpen(t, "day05.txt"), "FZCMJCRHZ", "JSDHQMZGF"},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -140,7 +140,7 @@ func Test_day5(t *testing.T) {
 }
 
 func Test_day6(t *testing.T) {
-	reader := bufio.NewScanner(mustOpen(t, "control6.txt"))
+	reader := bufio.NewScanner(mustOpen(t, "control06.txt"))
 	var control []string
 	for reader.Scan() {
 		control = append(control, reader.Text())
@@ -155,7 +155,7 @@ func Test_day6(t *testing.T) {
 		{"control case 3", strings.NewReader(control[2]), 6, 23},
 		{"control case 4", strings.NewReader(control[3]), 10, 29},
 		{"control case 5", strings.NewReader(control[4]), 11, 26},
-		{"personal input", mustOpen(t, "day6.txt"), 1598, 2414},
+		{"personal input", mustOpen(t, "day06.txt"), 1598, 2414},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -176,7 +176,7 @@ func Test_day6(t *testing.T) {
 		{"control case 3", strings.NewReader(control[2]), 6, 23},
 		{"control case 4", strings.NewReader(control[3]), 10, 29},
 		{"control case 5", strings.NewReader(control[4]), 11, 26},
-		{"personal input", mustOpen(t, "day6.txt"), 1598, 2414},
+		{"personal input", mustOpen(t, "day06.txt"), 1598, 2414},
 	}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("fast - %s", tc.name), func(t *testing.T) {
@@ -190,12 +190,12 @@ func Test_day6(t *testing.T) {
 }
 
 func Benchmark_day6(b *testing.B) {
-	reader := bufio.NewScanner(mustOpen(b, "control6.txt"))
+	reader := bufio.NewScanner(mustOpen(b, "control06.txt"))
 	var testCases []string
 	for reader.Scan() {
 		testCases = append(testCases, reader.Text())
 	}
-	reader = bufio.NewScanner(mustOpen(b, "day6.txt"))
+	reader = bufio.NewScanner(mustOpen(b, "day06.txt"))
 	for reader.Scan() {
 		testCases = append(testCases, reader.Text())
 	}
@@ -218,8 +218,8 @@ func Test_day7(t *testing.T) {
 		in                           io.Reader
 		sumOfSmall, smallestToDelete int
 	}{
-		{"control case", mustOpen(t, "control7.txt"), 95437, 24933642},
-		{"personal input", mustOpen(t, "day7.txt"), 1453349, 2948823},
+		{"control case", mustOpen(t, "control07.txt"), 95437, 24933642},
+		{"personal input", mustOpen(t, "day07.txt"), 1453349, 2948823},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -238,8 +238,8 @@ func Test_day8(t *testing.T) {
 		in             io.Reader
 		visible, score int
 	}{
-		{"control case", mustOpen(t, "control8.txt"), 21, 8},
-		{"personal input", mustOpen(t, "day8.txt"), 1679, 536625},
+		{"control case", mustOpen(t, "control08.txt"), 21, 8},
+		{"personal input", mustOpen(t, "day08.txt"), 1679, 536625},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -260,9 +260,9 @@ func Test_day9(t *testing.T) {
 		in                            io.Reader
 		tailVisited, chainTailVisited int
 	}{
-		{"control case", mustOpen(t, "control9.txt"), 13, 1},
-		{"control case 2", mustOpen(t, "control9-2.txt"), 88, 36},
-		{"personal input", mustOpen(t, "day9.txt"), 6494, 2691},
+		{"control case", mustOpen(t, "control09.txt"), 13, 1},
+		{"control case 2", mustOpen(t, "control09-2.txt"), 88, 36},
+		{"personal input", mustOpen(t, "day09.txt"), 6494, 2691},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
