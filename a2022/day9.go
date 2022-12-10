@@ -2,17 +2,42 @@ package a2022
 
 import (
 	"encoding/csv"
+	"errors"
 	"io"
 
 	"github.com/gocarina/gocsv"
 )
 
-type coordinates struct {
-	x, y int
+type coordinates struct{ x, y int }
+
+// vector represents the amount a ropeKnot will move
+// it aliases coordinates for convenience as I am lazy
+type vector coordinates
+
+// a basicDirection corresponds to one of four preset vectors
+// this makes moving the head knot super simple
+var letterToVector = map[string]vector{
+	"U": {0, 1}, "L": {-1, 0},
+	"D": {0, -1}, "R": {1, 0},
+}
+
+// basicDirection adds very minimal safety to ropeInstruction parsing
+//
+// input is very constraints so this doesn't really guard against much,
+// but it does let us translate to a vector on the way in
+type basicDirection struct{ vec vector }
+
+func (d *basicDirection) UnmarshalCSV(s string) error {
+	if vec, ok := letterToVector[s]; !ok {
+		return errors.New("unknown direction")
+	} else {
+		d.vec = vec
+	}
+	return nil
 }
 
 type ropeInstruction struct {
-	D     string
+	D     basicDirection
 	Count int
 }
 
@@ -29,32 +54,27 @@ func makeRopeKnot(i, count int) *ropeKnot {
 	return &ropeKnot{coordinates{0, 0}, map[coordinates]bool{coordinates{0, 0}: true}, makeRopeKnot(i+1, count)}
 }
 
-func (r *ropeKnot) move(d string) {
-	switch d {
-	case "R":
-		r.position = coordinates{r.position.x + 1, r.position.y}
-	case "L":
-		r.position = coordinates{r.position.x - 1, r.position.y}
-	case "U":
-		r.position = coordinates{r.position.x, r.position.y + 1}
-	case "D":
-		r.position = coordinates{r.position.x, r.position.y - 1}
-	}
+func (r *ropeKnot) move(d basicDirection) {
+	r.position = coordinates{r.position.x + d.vec.x, r.position.y + d.vec.y}
 	r.history[r.position] = true
 	r.tail.follow(r.position)
 }
 
-func (r *ropeKnot) follow(p coordinates) {
-	deltaX, deltaY := p.x-r.position.x, p.y-r.position.y
-	dX, dY := abs(deltaX), abs(deltaY)
-	if dX > 2 || dY > 2 {
-		panic("delta should never exceed 2")
+// knotPair only used to disambiguate head and tail inputs for getMoveVector
+type knotPair struct{ head, tail coordinates }
+
+func getMoveVector(kp knotPair) vector {
+	deltaX, deltaY := kp.head.x-kp.tail.x, kp.head.y-kp.tail.y
+	if abs(deltaX) == 2 || abs(deltaY) == 2 {
+		return vector{sign(deltaX), sign(deltaY)}
 	}
-	if dX == 2 || dY == 2 {
-		moveX, moveY := sign(deltaX), sign(deltaY)
-		r.position = coordinates{r.position.x + moveX, r.position.y + moveY}
-		r.history[r.position] = true
-	}
+	return vector{0, 0}
+}
+
+func (r *ropeKnot) follow(head coordinates) {
+	moveVec := getMoveVector(knotPair{head, r.position})
+	r.position = coordinates{r.position.x + moveVec.x, r.position.y + moveVec.y}
+	r.history[r.position] = true
 	if r.tail != nil {
 		r.tail.follow(r.position)
 	}
