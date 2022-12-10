@@ -25,8 +25,8 @@ type rpsHand struct {
 	play rpsPlay
 }
 
-func (r *rpsHand) score() int {
-	return int(r.play) + 1
+func (r rpsPlay) score() int {
+	return int(r) + 1
 }
 
 func (r *rpsHand) UnmarshalCSV(s string) error {
@@ -48,35 +48,33 @@ type rpsRound struct {
 }
 
 func (r rpsRound) result(isPlay bool) int {
-	keyBeats := map[rpsHand]rpsHand{
-		{rpsRock}:    {rpsScissor},
-		{rpsScissor}: {rpsPaper},
-		{rpsPaper}:   {rpsRock},
+	keyWins := map[rpsHand]rpsPlay{
+		{rpsRock}:    rpsScissor,
+		{rpsScissor}: rpsPaper,
+		{rpsPaper}:   rpsRock,
 	}
-	keyLoses := map[rpsHand]rpsHand{
-		{rpsScissor}: {rpsRock},
-		{rpsPaper}:   {rpsScissor},
-		{rpsRock}:    {rpsPaper},
+	keyLoses := map[rpsHand]rpsPlay{
+		{rpsScissor}: rpsRock,
+		{rpsPaper}:   rpsScissor,
+		{rpsRock}:    rpsPaper,
 	}
 	if isPlay {
 		switch true {
 		case r.Opp == r.Me:
-			return draw + r.Me.score()
-		case keyBeats[r.Me] == r.Opp:
-			return win + r.Me.score()
+			return draw + r.Me.play.score()
+		case keyWins[r.Me] == r.Opp.play:
+			return win + r.Me.play.score()
 		default:
-			return lose + r.Me.score()
+			return lose + r.Me.play.score()
 		}
 	}
 	switch r.Me.play {
 	case rpsRock: // Rock == lose
-		shouldPlay := keyBeats[r.Opp]
-		return lose + shouldPlay.score()
+		return lose + keyWins[r.Opp].score()
 	case rpsPaper: // Paper == draw
-		return draw + r.Opp.score()
+		return draw + r.Opp.play.score()
 	default: // Scissor = win
-		shouldPlay := keyLoses[r.Opp]
-		return win + shouldPlay.score()
+		return win + keyLoses[r.Opp].score()
 	}
 }
 func day2(in io.Reader, isPlay bool) int {
@@ -88,8 +86,8 @@ func day2(in io.Reader, isPlay bool) int {
 	}
 
 	total := 0
-	for _, r := range gameRounds {
-		score := r.result(isPlay)
+	for _, round := range gameRounds {
+		score := round.result(isPlay)
 		total += score
 	}
 	return total

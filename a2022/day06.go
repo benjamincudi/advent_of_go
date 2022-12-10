@@ -7,70 +7,26 @@ import (
 	"strings"
 )
 
-func lazyOverlapCheck(s []string) bool {
-	seen := map[string]bool{}
-	for _, letter := range s {
-		if seen[letter] {
-			return true
-		}
-		seen[letter] = true
-	}
-	return false
-}
-
 type day6result struct {
 	startOfPacket, startOfMessage int
-}
-
-type overlapChecker struct {
-	duplicates, length int
-	state              map[string]int
-	history            []string
-}
-
-func newOverlapChecker(l int) overlapChecker {
-	return overlapChecker{0, l, map[string]int{}, nil}
-}
-
-func (o *overlapChecker) initFrom(src []string) error {
-	if len(src) != o.length {
-		return errors.New("initFrom src must match overlapChecker length")
-	}
-	o.history = src
-	for _, s := range src {
-		if o.state[s] > 0 {
-			o.duplicates++
-		}
-		o.state[s]++
-	}
-	return nil
-}
-
-func (o *overlapChecker) next(s string) {
-	if o.state[s] > 0 {
-		o.duplicates++
-	}
-	o.state[s]++
-	if len(o.history) == o.length {
-		popped, rest := o.history[0], o.history[1:]
-		o.history = append(rest, s)
-		o.state[popped]--
-		if o.state[popped] > 0 {
-			o.duplicates--
-		}
-	} else if len(o.history) < o.length {
-		o.history = append(o.history, s)
-	}
-}
-
-func (o *overlapChecker) done() bool {
-	return len(o.history) == o.length && o.duplicates == 0
 }
 
 func day6(in io.Reader) day6result {
 	r := bufio.NewScanner(in)
 	r.Scan()
 	d := strings.Split(r.Text(), "")
+
+	lazyOverlapCheck := func(s []string) bool {
+		seen := map[string]bool{}
+		for _, letter := range s {
+			if seen[letter] {
+				return true
+			}
+			seen[letter] = true
+		}
+		return false
+	}
+
 	sop, som := -1, -1
 	for i := 4; i <= len(d); i++ {
 		if !lazyOverlapCheck(d[i-4 : i]) {
@@ -130,4 +86,49 @@ func day6fast(in io.Reader) day6result {
 		startOfPacket:  sop + 1,
 		startOfMessage: som + 1,
 	}
+}
+
+type overlapChecker struct {
+	duplicates, length int
+	state              map[string]int
+	history            []string
+}
+
+func newOverlapChecker(l int) overlapChecker {
+	return overlapChecker{0, l, map[string]int{}, nil}
+}
+
+func (o *overlapChecker) initFrom(src []string) error {
+	if len(src) != o.length {
+		return errors.New("initFrom src must match overlapChecker length")
+	}
+	o.history = src
+	for _, s := range src {
+		if o.state[s] > 0 {
+			o.duplicates++
+		}
+		o.state[s]++
+	}
+	return nil
+}
+
+func (o *overlapChecker) next(s string) {
+	if o.state[s] > 0 {
+		o.duplicates++
+	}
+	o.state[s]++
+	if len(o.history) == o.length {
+		popped, rest := o.history[0], o.history[1:]
+		o.history = append(rest, s)
+		o.state[popped]--
+		if o.state[popped] > 0 {
+			o.duplicates--
+		}
+	} else if len(o.history) < o.length {
+		o.history = append(o.history, s)
+	}
+}
+
+func (o *overlapChecker) done() bool {
+	return len(o.history) == o.length && o.duplicates == 0
 }
