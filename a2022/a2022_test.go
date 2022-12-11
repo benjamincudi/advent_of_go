@@ -326,3 +326,25 @@ func Test_day10(t *testing.T) {
 		})
 	}
 }
+
+func Test_day11(t *testing.T) {
+	testCases := []struct {
+		name                              string
+		in                                io.Reader
+		monkeyBusiness, bigMonkeyBusiness int
+	}{
+		{"control case", mustOpen(t, "control11.txt"), 10605, 2713310158},
+		{"personal input", mustOpen(t, "day11.txt"), 58322, 13937702909},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			monkeyBusiness, bigMonkeyBusiness := day11(tc.in)
+			if monkeyBusiness != tc.monkeyBusiness {
+				t.Errorf("expected monkeyBusiness %v, got %v", tc.monkeyBusiness, monkeyBusiness)
+			}
+			if bigMonkeyBusiness != tc.bigMonkeyBusiness {
+				t.Errorf("expected bigMonkeyBusiness %v, got %v", tc.bigMonkeyBusiness, bigMonkeyBusiness)
+			}
+		})
+	}
+}
