@@ -23,8 +23,7 @@ func checkDirection(height int, trees []int) direction {
 
 func checkDirections(index int, rowOrCol []int) (leftOrUp, rightOrDown direction) {
 	treeHeight := rowOrCol[index]
-	return checkDirection(treeHeight, reverse(append([]int{}, rowOrCol[:index]...))), // copy the slice so reverse doesn't mutate the forest
-		checkDirection(treeHeight, rowOrCol[index+1:])
+	return checkDirection(treeHeight, reverse(rowOrCol[:index])), checkDirection(treeHeight, rowOrCol[index+1:])
 }
 
 func day8(in io.Reader) (int, int) {

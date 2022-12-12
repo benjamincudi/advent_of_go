@@ -77,7 +77,8 @@ func day5(in io.Reader) (part1, part2 string) {
 	}
 
 	// Reverse the rows so we're building from bottom-up
-	reverse(crateRows)
+	crateRows = reverse(crateRows)
+
 	// generally pointless struct so that we can unmarshal instructions
 	type insRow struct{ I instruction }
 	var ins []insRow

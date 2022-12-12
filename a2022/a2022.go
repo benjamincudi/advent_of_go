@@ -19,12 +19,13 @@ func mustInt(s string) int {
 	return i
 }
 
-// Reverse the given slice
+// Make a reversed copy of the given slice
 //
-// Mutates the input, but also returns it, so it can be inlined to function calls
+// Does not mutate the input, assign the result to your input if that's what you want
 func reverse[E any](in []E) []E {
-	sort.SliceStable(in, func(i, j int) bool { return i > j })
-	return in
+	dest := append(make([]E, 0, len(in)), in...)
+	sort.SliceStable(dest, func(i, j int) bool { return i > j })
+	return dest
 }
 
 func abs[E ~int](x E) E {
