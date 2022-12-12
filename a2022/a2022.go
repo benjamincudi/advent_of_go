@@ -71,3 +71,11 @@ func mapValue[E any, F any](in []E, getValue func(E) F) []F {
 	}
 	return ret
 }
+
+func mapValueWithIndex[E any, F any](in []E, getValue func(int, E) F) []F {
+	var ret []F
+	for i, val := range in {
+		ret = append(ret, getValue(i, val))
+	}
+	return ret
+}

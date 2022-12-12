@@ -348,3 +348,25 @@ func Test_day11(t *testing.T) {
 		})
 	}
 }
+
+func Test_day12(t *testing.T) {
+	testCases := []struct {
+		name               string
+		in                 io.Reader
+		steps, scenicSteps int
+	}{
+		{"control case", mustOpen(t, "control12.txt"), 31, 29},
+		{"personal input", mustOpen(t, "day12.txt"), 412, 402},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			steps, scenicSteps := day12(tc.in)
+			if steps != tc.steps {
+				t.Errorf("expected steps %v, got %v", tc.steps, steps)
+			}
+			if scenicSteps != tc.scenicSteps {
+				t.Errorf("expected scenicSteps %v, got %v", tc.scenicSteps, scenicSteps)
+			}
+		})
+	}
+}
