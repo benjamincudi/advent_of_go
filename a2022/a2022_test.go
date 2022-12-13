@@ -370,3 +370,25 @@ func Test_day12(t *testing.T) {
 		})
 	}
 }
+
+func Test_day13(t *testing.T) {
+	testCases := []struct {
+		name         string
+		in           io.Reader
+		sum, decoder int
+	}{
+		{"control case", mustOpen(t, "control13.txt"), 13, 140},
+		{"personal input", mustOpen(t, "day13.txt"), 5843, 26289},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sum, decoder := day13(tc.in)
+			if sum != tc.sum {
+				t.Errorf("expected sum %v, got %v", tc.sum, sum)
+			}
+			if decoder != tc.decoder {
+				t.Errorf("expected decoder %v, got %v", tc.decoder, decoder)
+			}
+		})
+	}
+}
