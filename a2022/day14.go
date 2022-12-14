@@ -30,11 +30,7 @@ func day14(in io.Reader) (int, int) {
 	for i := range grid {
 		row := make([]string, maxX+100)
 		for j := range row {
-			if i+1 == maxY {
-				row[j] = "#"
-			} else {
-				row[j] = " "
-			}
+			row[j] = aElseB(i == maxY, "#", " ")
 		}
 		grid[i] = row
 	}

@@ -65,6 +65,13 @@ func minInt[E ~int](values ...E) E {
 	return max
 }
 
+func aElseB[E any](test bool, A, B E) E {
+	if test {
+		return A
+	}
+	return B
+}
+
 func mapValue[E any, F any](in []E, getValue func(E) F) []F {
 	ret := make([]F, len(in))
 	for i, val := range in {
