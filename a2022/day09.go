@@ -4,11 +4,18 @@ import (
 	"encoding/csv"
 	"errors"
 	"io"
+	"strings"
 
 	"github.com/gocarina/gocsv"
 )
 
-type coordinates struct{ x, y int }
+type coordinates struct{ X, Y int }
+
+func (c *coordinates) UnmarshalString(s string) error {
+	parts := strings.Split(s, ",")
+	c.X, c.Y = mustInt(parts[0]), mustInt(parts[1])
+	return nil
+}
 
 // vector represents the amount a ropeKnot will move
 // it aliases coordinates for convenience as I am lazy
@@ -55,7 +62,7 @@ func makeRopeKnot(i, count int) *ropeKnot {
 }
 
 func (r *ropeKnot) move(d basicDirection) {
-	r.position = coordinates{r.position.x + d.vec.x, r.position.y + d.vec.y}
+	r.position = coordinates{r.position.X + d.vec.X, r.position.Y + d.vec.Y}
 	r.history[r.position] = true
 	r.tail.follow(r.position)
 }
@@ -64,7 +71,7 @@ func (r *ropeKnot) move(d basicDirection) {
 type knotPair struct{ head, tail coordinates }
 
 func getMoveVector(kp knotPair) vector {
-	deltaX, deltaY := kp.head.x-kp.tail.x, kp.head.y-kp.tail.y
+	deltaX, deltaY := kp.head.X-kp.tail.X, kp.head.Y-kp.tail.Y
 	if abs(deltaX) == 2 || abs(deltaY) == 2 {
 		return vector{sign(deltaX), sign(deltaY)}
 	}
@@ -73,7 +80,7 @@ func getMoveVector(kp knotPair) vector {
 
 func (r *ropeKnot) follow(head coordinates) {
 	moveVec := getMoveVector(knotPair{head, r.position})
-	r.position = coordinates{r.position.x + moveVec.x, r.position.y + moveVec.y}
+	r.position = coordinates{r.position.X + moveVec.X, r.position.Y + moveVec.Y}
 	r.history[r.position] = true
 	if r.tail != nil {
 		r.tail.follow(r.position)

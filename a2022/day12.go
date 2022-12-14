@@ -21,20 +21,20 @@ func letterToInt(letter string) int {
 
 // used while filling out the node scores, in descending score/search
 func getValidVisitors(grid [][]int, p coordinates) []coordinates {
-	minNext := grid[p.y][p.x] - 1
+	minNext := grid[p.Y][p.X] - 1
 
 	var neighbors []coordinates
-	if p.x > 0 && grid[p.y][p.x-1] >= minNext {
-		neighbors = append(neighbors, coordinates{p.x - 1, p.y})
+	if p.X > 0 && grid[p.Y][p.X-1] >= minNext {
+		neighbors = append(neighbors, coordinates{p.X - 1, p.Y})
 	}
-	if p.y > 0 && grid[p.y-1][p.x] >= minNext {
-		neighbors = append(neighbors, coordinates{p.x, p.y - 1})
+	if p.Y > 0 && grid[p.Y-1][p.X] >= minNext {
+		neighbors = append(neighbors, coordinates{p.X, p.Y - 1})
 	}
-	if p.x < len(grid[p.y])-1 && grid[p.y][p.x+1] >= minNext {
-		neighbors = append(neighbors, coordinates{p.x + 1, p.y})
+	if p.X < len(grid[p.Y])-1 && grid[p.Y][p.X+1] >= minNext {
+		neighbors = append(neighbors, coordinates{p.X + 1, p.Y})
 	}
-	if p.y < len(grid)-1 && grid[p.y+1][p.x] >= minNext {
-		neighbors = append(neighbors, coordinates{p.x, p.y + 1})
+	if p.Y < len(grid)-1 && grid[p.Y+1][p.X] >= minNext {
+		neighbors = append(neighbors, coordinates{p.X, p.Y + 1})
 	}
 	return neighbors
 }
@@ -90,7 +90,7 @@ func day12(in io.Reader) (int, int) {
 		fmt.Printf("start %v, end %v\n", start, end)
 	}
 
-	endNode := nodeGrid[end.y][end.x]
+	endNode := nodeGrid[end.Y][end.X]
 	endNode.setScore(len(grid) * len(grid[0]))
 	queue := []*pathNode{endNode}
 	var currentQueueNode *pathNode
@@ -104,7 +104,7 @@ func day12(in io.Reader) (int, int) {
 
 		visitorScore := currentQueueNode.score - 1
 		for _, v := range possibleVisitors {
-			node := nodeGrid[v.y][v.x]
+			node := nodeGrid[v.Y][v.X]
 			node.addNeighbor(currentQueueNode)
 			if node.score == -1 {
 				node.setScore(visitorScore)
@@ -126,7 +126,7 @@ func day12(in io.Reader) (int, int) {
 	max := len(nodeGrid) * len(nodeGrid[0])
 	startingSteps, bestSteps := -1, max
 	for _, startingCoords := range allStarts {
-		steps, currentNode := 0, nodeGrid[startingCoords.y][startingCoords.x]
+		steps, currentNode := 0, nodeGrid[startingCoords.Y][startingCoords.X]
 		for {
 			// If we're stuck, give up - this isn't a winning starting location
 			if len(currentNode.neighbors) == 0 {
