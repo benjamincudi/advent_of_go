@@ -69,8 +69,7 @@ sandDrop:
 	for {
 		start := coordinates{500, 0}
 		for dX, falls := canDrop(start); falls; dX, falls = canDrop(start) {
-			start.X += dX
-			start.Y += 1
+			start.X, start.Y = start.X+dX, start.Y+1
 			// pretend there's an abyss instead of the floor
 			if start.Y == maxY-2 {
 				break sandDrop
@@ -93,8 +92,7 @@ sandDrop:
 	for {
 		start := coordinates{500, 0}
 		for dX, falls := canDrop(start); falls; dX, falls = canDrop(start) {
-			start.X += dX
-			start.Y += 1
+			start.X, start.Y = start.X+dX, start.Y+1
 		}
 		grid[start.Y][start.X] = "o"
 		withFloor++
