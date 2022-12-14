@@ -36,22 +36,19 @@ func day14(in io.Reader) (int, int) {
 	}
 
 	for _, line := range rockLines {
-		var from coordinates
+		var from *coordinates
 		for _, to := range line {
-			if from.X == 0 && from.Y == 0 {
-				grid[to.Y][to.X] = "#"
-			} else if from.X != to.X {
-				d := sign(to.X - from.X)
-				for x := from.X; x != to.X+d; x += d {
-					grid[from.Y][x] = "#"
-				}
-			} else {
-				d := sign(to.Y - from.Y)
-				for y := from.Y; y != to.Y+d; y += d {
-					grid[y][from.X] = "#"
+			if from != nil {
+				dX, dY := sign(to.X-from.X), sign(to.Y-from.Y)
+				// diagonal lines don't exist in the input, so one of these signs is
+				// always zero. if that isn't true, we could maybe fix this by doing
+				// conditional incrementing inside the loop
+				for x, y := from.X, from.Y; x != to.X+dX || y != to.Y+dY; x, y = x+dX, y+dY {
+					grid[y][x] = "#"
 				}
 			}
-			from = to
+			temp := to
+			from = &temp
 		}
 	}
 
