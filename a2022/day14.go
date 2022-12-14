@@ -52,13 +52,11 @@ func day14(in io.Reader) (int, int) {
 		}
 	}
 
-	canDrop := func(c coordinates) (int, bool) {
-		if grid[c.Y+1][c.X] == " " {
-			return 0, true
-		} else if grid[c.Y+1][c.X-1] == " " {
-			return -1, true
-		} else if grid[c.Y+1][c.X+1] == " " {
-			return 1, true
+	canDrop := func(c coordinates) (dX int, falls bool) {
+		for _, dX = range []int{0, -1, 1} {
+			if grid[c.Y+1][c.X+dX] == " " {
+				return dX, true
+			}
 		}
 		return 0, false
 	}
