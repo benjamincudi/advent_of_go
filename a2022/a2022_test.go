@@ -392,3 +392,25 @@ func Test_day13(t *testing.T) {
 		})
 	}
 }
+
+func Test_day14(t *testing.T) {
+	testCases := []struct {
+		name                 string
+		in                   io.Reader
+		sandUnits, withFloor int
+	}{
+		{"control case", mustOpen(t, "control14.txt"), 24, 93},
+		{"personal input", mustOpen(t, "day14.txt"), 825, 26729},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			sandUnits, withFloor := day14(tc.in)
+			if sandUnits != tc.sandUnits {
+				t.Errorf("expected sandUnits %v, got %v", tc.sandUnits, sandUnits)
+			}
+			if withFloor != tc.withFloor {
+				t.Errorf("expected withFloor %v, got %v", tc.withFloor, withFloor)
+			}
+		})
+	}
+}
