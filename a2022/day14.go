@@ -53,6 +53,9 @@ func day14(in io.Reader) (int, int) {
 	}
 
 	canDrop := func(c coordinates) (dX int, falls bool) {
+		if c.Y+1 == maxY {
+			return 0, false
+		}
 		for _, dX = range []int{0, -1, 1} {
 			if grid[c.Y+1][c.X+dX] == " " {
 				return dX, true
