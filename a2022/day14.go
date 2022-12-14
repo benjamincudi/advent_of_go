@@ -10,7 +10,7 @@ import (
 func day14(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
 	var rockLines [][]coordinates
-	minX, maxX, minY, maxY := 1000, 0, 1000, 0
+	minX, maxX, maxY := 1000, 0, 0
 	for scanner.Scan() {
 		rockLines = append(
 			rockLines,
@@ -19,7 +19,7 @@ func day14(in io.Reader) (int, int) {
 				if err := c.UnmarshalString(s); err != nil {
 					fmt.Printf("unexpected error: %v\n", err)
 				}
-				minX, maxX, minY, maxY = minInt(minX, c.X), maxInt(maxX, c.X), minInt(minY, c.Y), maxInt(maxY, c.Y)
+				minX, maxX, maxY = minInt(minX, c.X), maxInt(maxX, c.X), maxInt(maxY, c.Y)
 				return c
 			}),
 		)
