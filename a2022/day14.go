@@ -25,7 +25,7 @@ func day14(in io.Reader) (int, int) {
 		)
 	}
 
-	maxY += 3
+	maxY += 2
 	grid := make([][]string, maxY)
 	for i := range grid {
 		row := make([]string, maxX+100)
