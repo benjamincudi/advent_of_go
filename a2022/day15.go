@@ -9,7 +9,8 @@ import (
 )
 
 type sensorBeaconPairing struct {
-	S, B coordinates
+	S, B         coordinates
+	taxiDistance int
 }
 
 type coveredRange struct{ min, max int }
@@ -88,36 +89,43 @@ func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 		vals := mapValue(tokens, func(s string) int {
 			return mustInt(strings.TrimRight(strings.Split(s, "=")[1], ":,"))
 		})
-		pairs = append(pairs, sensorBeaconPairing{coordinates{vals[0], vals[1]}, coordinates{vals[2], vals[3]}})
+		dTotal := abs(vals[0]-vals[2]) + abs(vals[1]-vals[3])
+		pairs = append(pairs, sensorBeaconPairing{coordinates{vals[0], vals[1]}, coordinates{vals[2], vals[3]}, dTotal})
 	}
 
-	occupiedX := map[int]bool{}
+	// part 1
+	occupiedX := rowCoverage{}
 	for _, p := range pairs {
-		dTotal := abs(p.S.Y-p.B.Y) + abs(p.S.X-p.B.X)
 		rowDiff := abs(targetRow - p.S.Y)
-		if dTotal <= rowDiff {
+		if p.taxiDistance <= rowDiff {
 			continue
 		}
-		xRange := dTotal - rowDiff
-		for x := p.S.X - xRange; x <= p.S.X+xRange; x++ {
-			occupiedX[x] = true
-		}
+		xRange := p.taxiDistance - rowDiff
+		occupiedX.addRange(coveredRange{p.S.X - xRange, p.S.X + xRange})
 	}
+	covered := 0
+	for _, cr := range occupiedX.disjointRanges {
+		covered += (cr.max - cr.min) + 1 // ranges are inclusive, add 1 to make the math right
+	}
+	distinctBeaconsIncluded := map[int]bool{}
 	for _, p := range pairs {
 		if p.B.Y == targetRow {
-			delete(occupiedX, p.B.X)
+			distinctBeaconsIncluded[p.B.X] = true
 		}
 	}
+	covered -= len(distinctBeaconsIncluded)
+
+	// part 2
+	fullyCovered := coveredRange{0, upperBounds}
 	var tuningFrequency int
 	for y := 0; y <= upperBounds; y++ {
 		rc := rowCoverage{}
 		for _, p := range pairs {
-			dTotal := abs(p.S.Y-p.B.Y) + abs(p.S.X-p.B.X)
 			rowDiff := abs(y - p.S.Y)
-			if dTotal <= rowDiff {
+			if p.taxiDistance <= rowDiff {
 				continue
 			}
-			xRange := dTotal - rowDiff
+			xRange := p.taxiDistance - rowDiff
 			starting := maxInt(p.S.X-xRange, 0)
 			end := minInt(p.S.X+xRange, upperBounds)
 			if starting == 0 && end == upperBounds {
@@ -144,5 +152,5 @@ func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 			break
 		}
 	}
-	return len(occupiedX), tuningFrequency
+	return covered, tuningFrequency
 }
