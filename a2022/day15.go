@@ -76,6 +76,29 @@ func (rc *rowCoverage) consolidateRanges() {
 	rc.disjointRanges = consolidated
 }
 
+func getRowCoverage(pairs []sensorBeaconPairing, rowIndex, upperBounds int) rowCoverage {
+	rc := rowCoverage{}
+	for _, p := range pairs {
+		rowDiff := abs(rowIndex - p.S.Y)
+		if p.taxiDistance <= rowDiff {
+			continue
+		}
+		xRange := p.taxiDistance - rowDiff
+		starting := maxInt(p.S.X-xRange, 0)
+		end := minInt(p.S.X+xRange, upperBounds)
+		if starting == 0 && end == upperBounds {
+			// fully covers the row by itself - start next row
+			return rowCoverage{}
+		}
+		rc.addRange(coveredRange{starting, end})
+		if len(rc.disjointRanges) == 1 && rc.disjointRanges[0].equals(coveredRange{0, upperBounds}) {
+			// row is covered, stop checking it
+			return rowCoverage{}
+		}
+	}
+	return rc
+}
+
 func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 	scanner := bufio.NewScanner(in)
 	var pairs []sensorBeaconPairing
@@ -116,35 +139,18 @@ func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 	covered -= len(distinctBeaconsIncluded)
 
 	// part 2
-	fullyCovered := coveredRange{0, upperBounds}
 	var tuningFrequency int
 	for y := 0; y <= upperBounds; y++ {
-		rc := rowCoverage{}
-		for _, p := range pairs {
-			rowDiff := abs(y - p.S.Y)
-			if p.taxiDistance <= rowDiff {
-				continue
-			}
-			xRange := p.taxiDistance - rowDiff
-			starting := maxInt(p.S.X-xRange, 0)
-			end := minInt(p.S.X+xRange, upperBounds)
-			if starting == 0 && end == upperBounds {
-				// fully covers the row by itself - start next row
-				rc.disjointRanges = []coveredRange{fullyCovered}
-				break
-			}
-			rc.addRange(coveredRange{starting, end})
-			if len(rc.disjointRanges) == 1 && rc.disjointRanges[0].equals(coveredRange{0, upperBounds}) {
-				// row is covered, stop checking it
-				rc.disjointRanges = []coveredRange{fullyCovered}
-				break
-			}
-		}
+		rc := getRowCoverage(pairs, y, upperBounds)
 		// AoC guarantees there is only one space to find, the search is over when there are 2
 		// Separately, the control case has more than one spot, so we need to exit after the first
 		if len(rc.disjointRanges) == 2 {
 			left := maxInt(rc.disjointRanges[0].min, rc.disjointRanges[1].min)
 			missingX := left - 1
+			right := minInt(rc.disjointRanges[0].max, rc.disjointRanges[1].max)
+			if missingX != right+1 {
+				continue
+			}
 			if shouldLog {
 				fmt.Printf("distress coords %d,%d\n", missingX, y)
 			}
