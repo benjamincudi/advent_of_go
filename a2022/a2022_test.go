@@ -414,3 +414,26 @@ func Test_day14(t *testing.T) {
 		})
 	}
 }
+
+func Test_day15(t *testing.T) {
+	testCases := []struct {
+		name                               string
+		in                                 io.Reader
+		targetRow, upperBounds             int
+		occupiedPositions, tuningFrequency int
+	}{
+		{"control case", mustOpen(t, "control15.txt"), 10, 20, 26, 56000011},
+		{"personal input", mustOpen(t, "day15.txt"), 2000000, 4000000, 5112034, 13172087230812},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			occupiedPositions, tuningFrequency := day15(tc.in, tc.targetRow, tc.upperBounds)
+			if occupiedPositions != tc.occupiedPositions {
+				t.Errorf("expected occupiedPositions %v, got %v", tc.occupiedPositions, occupiedPositions)
+			}
+			if tuningFrequency != tc.tuningFrequency {
+				t.Errorf("expected tuningFrequency %v, got %v", tc.tuningFrequency, tuningFrequency)
+			}
+		})
+	}
+}

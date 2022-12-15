@@ -80,6 +80,16 @@ func mapValue[E any, F any](in []E, getValue func(E) F) []F {
 	return ret
 }
 
+func filter[E any](in []E, test func(E) bool) []E {
+	var ret []E
+	for _, val := range in {
+		if test(val) {
+			ret = append(ret, val)
+		}
+	}
+	return ret
+}
+
 func mapValueWithIndex[E any, F any](in []E, getValue func(int, E) F) []F {
 	ret := make([]F, len(in))
 	for i, val := range in {
