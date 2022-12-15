@@ -113,11 +113,7 @@ func day7(in io.Reader) (int, int) {
 			case "/":
 				currentDir = &rootDir
 			default:
-				if dir, ok := currentDir.childDirs[dest]; ok {
-					currentDir = dir
-				} else {
-					currentDir = currentDir.addDir(dest)
-				}
+				currentDir = currentDir.addDir(dest)
 			}
 		case cmdLs.MatchString(line):
 			// do nothing

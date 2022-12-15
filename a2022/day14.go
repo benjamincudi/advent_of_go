@@ -18,8 +18,9 @@ func day14(in io.Reader) (int, int) {
 				var c coordinates
 				if err := c.UnmarshalString(s); err != nil {
 					fmt.Printf("unexpected error: %v\n", err)
+				} else {
+					minX, maxX, maxY = minInt(minX, c.X), maxInt(maxX, c.X), maxInt(maxY, c.Y)
 				}
-				minX, maxX, maxY = minInt(minX, c.X), maxInt(maxX, c.X), maxInt(maxY, c.Y)
 				return c
 			}),
 		)

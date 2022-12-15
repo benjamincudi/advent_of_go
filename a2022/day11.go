@@ -83,11 +83,7 @@ func day11(in io.Reader) (int, int) {
 			m.inspectedCount += len(m.items)
 			for _, item := range m.items {
 				newWorry := m.inspect(item) / 3
-				if newWorry%m.testMod == 0 {
-					monkeys[m.testTrue].addItem(newWorry)
-				} else {
-					monkeys[m.testFalse].addItem(newWorry)
-				}
+				monkeys[aElseB(newWorry%m.testMod == 0, m.testTrue, m.testFalse)].addItem(newWorry)
 			}
 			m.items = []int{}
 		}
@@ -106,11 +102,7 @@ func day11(in io.Reader) (int, int) {
 				// it'd be nice to have a proof of why this is the right choice
 				// in lieu of that, it was the only idea that led to the control case passing
 				newWorry := m.inspect(item) % safeMod
-				if newWorry%m.testMod == 0 {
-					monkeys[m.testTrue].addItem(newWorry)
-				} else {
-					monkeys[m.testFalse].addItem(newWorry)
-				}
+				monkeys[aElseB(newWorry%m.testMod == 0, m.testTrue, m.testFalse)].addItem(newWorry)
 			}
 			m.items = []int{}
 		}
