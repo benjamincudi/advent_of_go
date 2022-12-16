@@ -72,6 +72,14 @@ func aElseB[E any](test bool, A, B E) E {
 	return B
 }
 
+func mapMapValues[K comparable, E any, F any](in map[K]E, getValue func(K, E) F) []F {
+	ret := make([]F, 0, len(in))
+	for k, v := range in {
+		ret = append(ret, getValue(k, v))
+	}
+	return ret
+}
+
 func mapValue[E any, F any](in []E, getValue func(E) F) []F {
 	ret := make([]F, len(in))
 	for i, val := range in {
