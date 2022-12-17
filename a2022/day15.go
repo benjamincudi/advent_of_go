@@ -143,7 +143,6 @@ func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 	for y := 0; y <= upperBounds; y++ {
 		rc := getRowCoverage(pairs, y, upperBounds)
 		// AoC guarantees there is only one space to find, the search is over when there are 2
-		// Separately, the control case has more than one spot, so we need to exit after the first
 		if len(rc.disjointRanges) == 2 {
 			left := maxInt(rc.disjointRanges[0].min, rc.disjointRanges[1].min)
 			missingX := left - 1
