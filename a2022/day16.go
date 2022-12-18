@@ -114,7 +114,7 @@ func day16(in io.Reader) int {
 		fmt.Printf("%s has edges: %v\n", pv.name, valueEdges)
 	}
 
-	bestRelease, permutationsChecked := recursePaths(valveMap, "AA", 30, map[string]int{})
+	bestRelease, permutationsChecked := recursePaths(valveMap, "AA", 30, map[string]int{"AA": 30})
 	fmt.Printf("checked %d options\n", permutationsChecked)
 
 	return bestRelease
