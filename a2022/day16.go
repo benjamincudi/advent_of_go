@@ -60,7 +60,7 @@ func recursePaths(valveMap map[string]*pressureValve, fromNode string, remaining
 	return best, checked
 }
 
-func day16(in io.Reader) int {
+func day16(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
 
 	valveMap := map[string]*pressureValve{}
@@ -117,5 +117,5 @@ func day16(in io.Reader) int {
 	bestRelease, permutationsChecked := recursePaths(valveMap, "AA", 30, map[string]int{"AA": 30})
 	fmt.Printf("checked %d options\n", permutationsChecked)
 
-	return bestRelease
+	return bestRelease, 0
 }

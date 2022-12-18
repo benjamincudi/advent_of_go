@@ -440,22 +440,22 @@ func Test_day15(t *testing.T) {
 
 func Test_day16(t *testing.T) {
 	testCases := []struct {
-		name             string
-		in               io.Reader
-		pressureReleased int
+		name                           string
+		in                             io.Reader
+		pressureReleased, withElephant int
 	}{
-		{"control case", mustOpen(t, "control16.txt"), 1651},
-		{"personal input", mustOpen(t, "day16.txt"), 1857},
+		{"control case", mustOpen(t, "control16.txt"), 1651, 1707},
+		{"personal input", mustOpen(t, "day16.txt"), 1857, 1707},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			pressureReleased := day16(tc.in)
+			pressureReleased, withElephant := day16(tc.in)
 			if pressureReleased != tc.pressureReleased {
 				t.Errorf("expected pressureReleased %v, got %v", tc.pressureReleased, pressureReleased)
 			}
-			//if tuningFrequency != tc.tuningFrequency {
-			//	t.Errorf("expected tuningFrequency %v, got %v", tc.tuningFrequency, tuningFrequency)
-			//}
+			if withElephant != tc.withElephant {
+				t.Errorf("expected withElephant %v, got %v", tc.withElephant, withElephant)
+			}
 		})
 	}
 }
