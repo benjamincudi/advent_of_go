@@ -445,7 +445,7 @@ func Test_day16(t *testing.T) {
 		pressureReleased, withElephant int
 	}{
 		{"control case", mustOpen(t, "control16.txt"), 1651, 1707},
-		{"personal input", mustOpen(t, "day16.txt"), 1857, 1707},
+		{"personal input", mustOpen(t, "day16.txt"), 1857, 2536},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

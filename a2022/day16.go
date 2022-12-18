@@ -26,10 +26,11 @@ func copyMap[K comparable, V any](in map[K]V) map[K]V {
 	return ret
 }
 
-func recursePaths(valveMap map[string]*pressureValve, fromNode string, remainingTime int, valvesOpenedFor map[string]int) (int, int) {
-	best := 0
-	checked := 0
-	for next, time := range valveMap[fromNode].valueEdges {
+func recursePaths(valveMap map[string]*pressureValve, walkerLocations []string, valvesOpenedFor map[string]int) (int, int) {
+	best, checked := 0, 0
+	remainingTime := maxInt(mapValue(walkerLocations, func(name string) int { return valvesOpenedFor[name] })...)
+	currentWalkerIndex := aElseB(valvesOpenedFor[walkerLocations[0]] == remainingTime, 0, 1)
+	for next, time := range valveMap[walkerLocations[currentWalkerIndex]].valueEdges {
 		// if the valve was already opened, don't go back
 		if _, opened := valvesOpenedFor[next]; opened {
 			continue
@@ -41,7 +42,9 @@ func recursePaths(valveMap map[string]*pressureValve, fromNode string, remaining
 		voat := copyMap(valvesOpenedFor)
 		// we can make it, and it is currently closed, so go there and open it
 		voat[next] = remainingTime - time
-		total, permutations := recursePaths(valveMap, next, remainingTime-time, voat)
+		nextWalkerLocations := append([]string{}, walkerLocations...)
+		nextWalkerLocations[currentWalkerIndex] = next
+		total, permutations := recursePaths(valveMap, nextWalkerLocations, voat)
 		checked += permutations
 		best = aElseB(total > best, total, best)
 	}
@@ -114,8 +117,16 @@ func day16(in io.Reader) (int, int) {
 		fmt.Printf("%s has edges: %v\n", pv.name, valueEdges)
 	}
 
-	bestRelease, permutationsChecked := recursePaths(valveMap, "AA", 30, map[string]int{"AA": 30})
+	bestRelease, permutationsChecked := recursePaths(valveMap, []string{"AA"}, map[string]int{"AA": 30})
 	fmt.Printf("checked %d options\n", permutationsChecked)
 
-	return bestRelease, 0
+	withElephant, permutationsChecked := recursePaths(valveMap, []string{"AA", "AA"}, map[string]int{"AA": 26})
+	fmt.Printf("checked %d options\n", permutationsChecked)
+
+	// fully naive, no heuristics
+	// checked 215953 options (bestRelease) ~0.6s
+	// checked 127119358 options
+	//    --- PASS: Test_day16/personal_input (559.26s)
+
+	return bestRelease, withElephant
 }
