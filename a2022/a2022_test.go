@@ -459,3 +459,25 @@ func Test_day16(t *testing.T) {
 		})
 	}
 }
+
+func Test_day18(t *testing.T) {
+	testCases := []struct {
+		name                         string
+		in                           io.Reader
+		surfaceArea, exteriorSurface int
+	}{
+		{"control case", mustOpen(t, "control18.txt"), 64, 58},
+		{"personal input", mustOpen(t, "day18.txt"), 3432, 2042},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			surfaceArea, exteriorSurface := day18(tc.in)
+			if surfaceArea != tc.surfaceArea {
+				t.Errorf("expected surfaceArea %v, got %v", tc.surfaceArea, surfaceArea)
+			}
+			if exteriorSurface != tc.exteriorSurface {
+				t.Errorf("expected exteriorSurface %v, got %v", tc.exteriorSurface, exteriorSurface)
+			}
+		})
+	}
+}
