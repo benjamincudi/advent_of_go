@@ -503,3 +503,25 @@ func Test_day19(t *testing.T) {
 		})
 	}
 }
+
+func Test_day20(t *testing.T) {
+	testCases := []struct {
+		name                  string
+		in                    io.Reader
+		coordSum, withDecrypt int
+	}{
+		{"control case", mustOpen(t, "control20.txt"), 3, 1623178306},
+		{"personal input", mustOpen(t, "day20.txt"), 7225, 548634267428},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			coordSum, withDecrypt := day20_ll(tc.in)
+			if coordSum != tc.coordSum {
+				t.Errorf("expected coordSum %v, got %v", tc.coordSum, coordSum)
+			}
+			if withDecrypt != tc.withDecrypt {
+				t.Errorf("expected withDecrypt %v, got %v", tc.withDecrypt, withDecrypt)
+			}
+		})
+	}
+}
