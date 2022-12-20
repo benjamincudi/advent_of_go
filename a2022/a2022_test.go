@@ -481,3 +481,25 @@ func Test_day18(t *testing.T) {
 		})
 	}
 }
+
+func Test_day19(t *testing.T) {
+	testCases := []struct {
+		name         string
+		in           io.Reader
+		totalQuality int
+	}{
+		{"control case", mustOpen(t, "control19.txt"), 33},
+		{"personal input", mustOpen(t, "day19.txt"), 1147},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			totalQuality := day19(tc.in)
+			if totalQuality != tc.totalQuality {
+				t.Errorf("expected totalQuality %v, got %v", tc.totalQuality, totalQuality)
+			}
+			//if exteriorSurface != tc.exteriorSurface {
+			//	t.Errorf("expected exteriorSurface %v, got %v", tc.exteriorSurface, exteriorSurface)
+			//}
+		})
+	}
+}
