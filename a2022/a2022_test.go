@@ -525,3 +525,25 @@ func Test_day20(t *testing.T) {
 		})
 	}
 }
+
+func Test_day21(t *testing.T) {
+	testCases := []struct {
+		name               string
+		in                 io.Reader
+		rootYell, humnYell int
+	}{
+		{"control case", mustOpen(t, "control21.txt"), 152, 301},
+		{"personal input", mustOpen(t, "day21.txt"), 142707821472432, 3587647562851},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			rootYell, humnYell := day21(tc.in)
+			if rootYell != tc.rootYell {
+				t.Errorf("expected rootYell %v, got %v", tc.rootYell, rootYell)
+			}
+			if humnYell != tc.humnYell {
+				t.Errorf("expected humnYell %v, got %v", tc.humnYell, humnYell)
+			}
+		})
+	}
+}
