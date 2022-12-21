@@ -17,7 +17,9 @@ type blueprint struct {
 	obsidianRobotCost, geodeRobotCost compositeCost
 }
 
-func day19(in io.Reader) int {
+var remainingTimeToMaxGeodes = map[int]int{}
+
+func day19(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
 	var blueprints []blueprint
 	for scanner.Scan() {
@@ -30,16 +32,29 @@ func day19(in io.Reader) int {
 			compositeCost{numbers[5], numbers[6]}})
 	}
 
+	for i := 1; i < 33; i++ {
+		remainingTimeToMaxGeodes[i] = (i * (i + 1)) / 2
+	}
+
 	totalQuality := 0
 	for _, bp := range blueprints {
-		v := mostGeodes(bp, harvestState{0, 0, 0, 0, 1, 0, 0, 0}, 0)
+		v := mostGeodes(bp, harvestState{0, 0, 0, 0, 1, 0, 0, 0}, 0, 24, 0)
 		if shouldLog {
 			fmt.Printf("blueprint id %d has max geodes %d, score of %d\n", bp.id, v, bp.id*v)
 		}
 		totalQuality += bp.id * v
 	}
 
-	return totalQuality
+	top3 := 1
+	for _, bp := range blueprints[:minInt(len(blueprints), 3)] {
+		v := mostGeodes(bp, harvestState{0, 0, 0, 0, 1, 0, 0, 0}, 0, 32, 0)
+		if shouldLog {
+			fmt.Printf("blueprint id %d has max geodes %d, score of %d\n", bp.id, v, bp.id*v)
+		}
+		top3 *= v
+	}
+
+	return totalQuality, top3
 }
 
 type harvestState struct {
@@ -156,24 +171,27 @@ func (hs harvestState) build(bp blueprint, t buildTarget, minutes int) harvestSt
 	}
 }
 
-func mostGeodes(bp blueprint, hs harvestState, minute int) int {
-	if minute == 24 {
+func mostGeodes(bp blueprint, hs harvestState, minute, maxMinutes, bestSoFar int) int {
+	if minute == maxMinutes {
 		return hs.geodes
 	}
-	remainingTime := 24 - minute
+	remainingTime := maxMinutes - minute
+	if (remainingTimeToMaxGeodes[remainingTime] + hs.geodeRobots*remainingTime + hs.geodes) < bestSoFar {
+		return bestSoFar
+	}
 	buildOptions := hs.canBuildAfter(bp)
-	best := 0
+	best := bestSoFar
 	allowDoNothing := minInt(mapMapValues(buildOptions, func(t buildTarget, time int) int { return time })...) > remainingTime
 	for t, canBuildAfter := range buildOptions {
 		// We don't have a necessary gathering robot yet
 		// Or it would complete after time is up
-		if canBuildAfter < 1 || minute+canBuildAfter > 24 {
+		if canBuildAfter < 1 || minute+canBuildAfter > maxMinutes {
 			continue
 		}
-		best = maxInt(best, mostGeodes(bp, hs.build(bp, t, canBuildAfter), minute+canBuildAfter))
+		best = maxInt(best, mostGeodes(bp, hs.build(bp, t, canBuildAfter), minute+canBuildAfter, maxMinutes, best))
 	}
 	if allowDoNothing {
-		best = maxInt(best, mostGeodes(bp, hs.build(bp, nothing, remainingTime), minute+remainingTime))
+		best = maxInt(best, mostGeodes(bp, hs.build(bp, nothing, remainingTime), minute+remainingTime, maxMinutes, best))
 	}
 	return best
 }
