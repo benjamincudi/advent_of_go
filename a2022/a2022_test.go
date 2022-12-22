@@ -460,6 +460,28 @@ func Test_day16(t *testing.T) {
 	}
 }
 
+func Test_day17(t *testing.T) {
+	testCases := []struct {
+		name                   string
+		in                     io.Reader
+		height, trillionHeight int
+	}{
+		{"control case", mustOpen(t, "control17.txt"), 3068, 1514285714288},
+		{"personal input", mustOpen(t, "day17.txt"), 3106, -1},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			height := day17(tc.in)
+			if height != tc.height {
+				t.Errorf("expected height %v, got %v", tc.height, height)
+			}
+			//if trillionHeight != tc.trillionHeight {
+			//	t.Errorf("expected trillionHeight %v, got %v", tc.trillionHeight, trillionHeight)
+			//}
+		})
+	}
+}
+
 func Test_day18(t *testing.T) {
 	testCases := []struct {
 		name                         string
