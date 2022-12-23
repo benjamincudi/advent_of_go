@@ -61,17 +61,50 @@ func (tg *tetrisGrid) String() string {
 	return grid
 }
 
-func day17(in io.Reader) int {
+func day17(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
 	scanner.Scan()
 	wind := mapValue(strings.Split(scanner.Text(), ""), func(s string) int { return aElseB(s == "<", -1, 1) })
+	windLen := len(wind)
 	tg := tetrisGrid{[][]bool{}}
 	turn := 0
-	for i := 0; i < 2022; i++ {
+	type cacheEntry struct{ numRocks, currentHeight []int }
+	cache := map[int]cacheEntry{}
+	rocksToDrop := 1000000000000
+	part1height, elidedHeight := 0, 0
+	for i := 0; i < rocksToDrop; i++ {
+		if i == 2022 {
+			part1height = tg.getHeight()
+		}
+
 		var shape tetrisShape
 		switch i % 5 {
 		case 0:
 			shape = makeTetrisLine(tg.getHeight())
+			// lazy to ensure we don't find the cycle too soon and miss having an answer for part 1
+			if i > 2022 && elidedHeight == 0 {
+				if entry, cached := cache[turn%windLen]; cached {
+					if len(entry.currentHeight) > 2 {
+						histLen := len(entry.currentHeight) - 1
+						if entry.currentHeight[histLen]-entry.currentHeight[histLen-1] == entry.currentHeight[histLen-1]-entry.currentHeight[histLen-2] {
+							heightDiff := entry.currentHeight[histLen] - entry.currentHeight[histLen-2]
+							cycleLength := entry.numRocks[histLen] - entry.numRocks[histLen-2]
+							additionalCompleteCycles := (rocksToDrop-entry.numRocks[histLen-2])/cycleLength - 2
+							elidedHeight = heightDiff * additionalCompleteCycles
+							i += additionalCompleteCycles * cycleLength
+							if i == rocksToDrop {
+								return part1height, tg.getHeight() + elidedHeight
+							}
+						}
+					}
+					cache[turn%windLen] = cacheEntry{
+						append(entry.numRocks, i),
+						append(entry.currentHeight, tg.getHeight()),
+					}
+				} else {
+					cache[turn%windLen] = cacheEntry{[]int{i}, []int{tg.getHeight()}}
+				}
+			}
 		case 1:
 			shape = makeTetrisPlus(tg.getHeight())
 		case 2:
@@ -83,7 +116,7 @@ func day17(in io.Reader) int {
 		}
 
 		for {
-			shape.maybeWind(wind[turn%len(wind)], tg)
+			shape.maybeWind(wind[turn%windLen], tg)
 			turn++
 			if !shape.maybeFall(tg) {
 				tg.recordBlocks(shape)
@@ -95,7 +128,7 @@ func day17(in io.Reader) int {
 
 	//fmt.Println("final grid\n\n ")
 	//fmt.Printf("%s\n", tg.String())
-	return tg.getHeight()
+	return part1height, tg.getHeight() + elidedHeight
 }
 
 type tetrisLine struct {
