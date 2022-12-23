@@ -572,22 +572,23 @@ func Test_day21(t *testing.T) {
 
 func Test_day22(t *testing.T) {
 	testCases := []struct {
-		name     string
-		in       io.Reader
-		password int
+		name               string
+		in                 io.Reader
+		gridSize, password int
+		cubePassword       int
 	}{
-		{"control case", mustOpen(t, "control22.txt"), 6032},
-		{"personal input", mustOpen(t, "day22.txt"), 93226},
+		{"control case", mustOpen(t, "control22.txt"), 4, 6032, 5031},
+		{"personal input", mustOpen(t, "day22.txt"), 50, 93226, 5031},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			password := day22(tc.in)
+			password, cubePassword := day22(tc.in, tc.gridSize)
 			if password != tc.password {
 				t.Errorf("expected password %v, got %v", tc.password, password)
 			}
-			//if humnYell != tc.humnYell {
-			//	t.Errorf("expected humnYell %v, got %v", tc.humnYell, humnYell)
-			//}
+			if cubePassword != tc.cubePassword {
+				t.Errorf("expected cubePassword %v, got %v", tc.cubePassword, cubePassword)
+			}
 		})
 	}
 }
