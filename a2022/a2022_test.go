@@ -592,3 +592,25 @@ func Test_day22(t *testing.T) {
 		})
 	}
 }
+
+func Test_day23(t *testing.T) {
+	testCases := []struct {
+		name                    string
+		in                      io.Reader
+		emptySpaces, finalRound int
+	}{
+		{"control case", mustOpen(t, "control23.txt"), 110, 20},
+		{"personal input", mustOpen(t, "day23.txt"), 4034, 960},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			emptySpaces, finalRound := day23(tc.in)
+			if emptySpaces != tc.emptySpaces {
+				t.Errorf("expected emptySpaces %v, got %v", tc.emptySpaces, emptySpaces)
+			}
+			if finalRound != tc.finalRound {
+				t.Errorf("expected finalRound %v, got %v", tc.finalRound, finalRound)
+			}
+		})
+	}
+}
