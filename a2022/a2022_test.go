@@ -636,3 +636,22 @@ func Test_day24(t *testing.T) {
 		})
 	}
 }
+
+func Test_day25(t *testing.T) {
+	testCases := []struct {
+		name     string
+		in       io.Reader
+		snafuSum string
+	}{
+		{"control case", mustOpen(t, "control25.txt"), "2=-1=0"},
+		{"personal input", mustOpen(t, "day25.txt"), "2-0==21--=0==2201==2"},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			snafuSum := day25(tc.in)
+			if snafuSum != tc.snafuSum {
+				t.Errorf("expected snafuSum %v, got %v", tc.snafuSum, snafuSum)
+			}
+		})
+	}
+}
