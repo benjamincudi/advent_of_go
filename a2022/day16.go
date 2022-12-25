@@ -2,9 +2,9 @@ package a2022
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -26,11 +26,24 @@ func copyMap[K comparable, V any](in map[K]V) map[K]V {
 	return ret
 }
 
-func recursePaths(valveMap map[string]*pressureValve, walkerLocations []string, valvesOpenedFor map[string]int) (int, int) {
-	best, checked := 0, 0
-	remainingTime := maxInt(mapValue(walkerLocations, func(name string) int { return valvesOpenedFor[name] })...)
-	currentWalkerIndex := aElseB(valvesOpenedFor[walkerLocations[0]] == remainingTime, 0, 1)
-	for next, time := range valveMap[walkerLocations[currentWalkerIndex]].valueEdges {
+func anyOverlap[K comparable, V any](left, right map[K]V) bool {
+	for key := range left {
+		if _, ok := right[key]; ok {
+			return true
+		}
+	}
+	return false
+}
+
+type cacheVal struct {
+	best      int
+	valveUsed map[string]int
+}
+
+func recursePaths(valveMap map[string]*pressureValve, fromNode string, remainingTime int, valvesOpenedFor map[string]int, cache map[string]cacheVal) (int, int) {
+	best := 0
+	checked := 0
+	for next, time := range valveMap[fromNode].valueEdges {
 		// if the valve was already opened, don't go back
 		if _, opened := valvesOpenedFor[next]; opened {
 			continue
@@ -42,24 +55,33 @@ func recursePaths(valveMap map[string]*pressureValve, walkerLocations []string, 
 		voat := copyMap(valvesOpenedFor)
 		// we can make it, and it is currently closed, so go there and open it
 		voat[next] = remainingTime - time
-		nextWalkerLocations := append([]string{}, walkerLocations...)
-		nextWalkerLocations[currentWalkerIndex] = next
-		total, permutations := recursePaths(valveMap, nextWalkerLocations, voat)
+		total, permutations := recursePaths(valveMap, next, remainingTime-time, voat, cache)
 		checked += permutations
 		best = aElseB(total > best, total, best)
 	}
-	// if we ran out of time to go anywhere else, calculate our total and return it
+
+	// Always calculate the result for our current state to cache it
+	var usedValves []string
+	totals := mapMapValues(valvesOpenedFor, func(name string, time int) int {
+		usedValves = append(usedValves, name)
+		return time * valveMap[name].flowRate
+	})
+	sum := 0
+	for _, t := range totals {
+		sum += t
+	}
+	sort.Strings(usedValves)
+	cacheKey := strings.Join(usedValves, "")
+	cache[cacheKey] = cacheVal{
+		// we don't actually care what the order is here, its just for overlap lookup
+		valveUsed: valvesOpenedFor,
+		best:      maxInt(cache[cacheKey].best, sum),
+	}
+	// if we ran out of time to go anywhere else, return our own sum
 	if best == 0 {
-		totals := mapMapValues(valvesOpenedFor, func(name string, time int) int {
-			return time * valveMap[name].flowRate
-		})
-		sum := 0
-		for _, t := range totals {
-			sum += t
-		}
 		return sum, 1
 	}
-	// return the best subtree we found
+	// otherwise, return best subtree we found
 	return best, checked
 }
 
@@ -114,19 +136,28 @@ func day16(in io.Reader) (int, int) {
 
 		pv.valueEdges = valueEdges
 
-		fmt.Printf("%s has edges: %v\n", pv.name, valueEdges)
+		//fmt.Printf("%s has edges: %v\n", pv.name, valueEdges)
 	}
 
-	bestRelease, permutationsChecked := recursePaths(valveMap, []string{"AA"}, map[string]int{"AA": 30})
-	fmt.Printf("checked %d options\n", permutationsChecked)
+	cache := map[string]cacheVal{}
+	_, _ = recursePaths(valveMap, "AA", 30, map[string]int{}, cache)
+	//fmt.Printf("checked %d options\n", permutationsChecked)
+	// empty the cache on the way through so we can just reuse it
+	bestRelease := maxInt(mapMapValues(cache, func(key string, v cacheVal) int { delete(cache, key); return v.best })...)
 
-	withElephant, permutationsChecked := recursePaths(valveMap, []string{"AA", "AA"}, map[string]int{"AA": 26})
-	fmt.Printf("checked %d options\n", permutationsChecked)
-
-	// fully naive, no heuristics
-	// checked 215953 options (bestRelease) ~0.6s
-	// checked 127119358 options
-	//    --- PASS: Test_day16/personal_input (559.26s)
+	_, _ = recursePaths(valveMap, "AA", 26, map[string]int{}, cache)
+	//fmt.Printf("checked %d options\n", permutationsChecked)
+	withElephant := 0
+	for key, combo := range cache {
+		for _, candidate := range cache {
+			if anyOverlap(combo.valveUsed, candidate.valveUsed) {
+				continue
+			}
+			withElephant = maxInt(withElephant, combo.best+candidate.best)
+		}
+		// we never need to revisit this key as we've checked every combo, shrink the candidate set going forward
+		delete(cache, key)
+	}
 
 	return bestRelease, withElephant
 }
