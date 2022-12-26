@@ -340,10 +340,9 @@ func day22(in io.Reader, gridSize int) (int, int) {
 	for from, to := range magicRemap {
 		fromPoints := getEdgeFromFace(from.face, from.edge)
 		toPoints := getEdgeFromFace(to.face, to.edge)
-		if (from.edge == left && to.edge == up) || (from.edge == right && to.edge == down) ||
-			(from.edge == up && to.edge == left) || (from.edge == down && to.edge == right) {
-			// index lines up already, do nothing
-		} else {
+		if (from.edge == to.edge) ||
+			(from.edge == left && to.edge == down) || (from.edge == down && to.edge == left) ||
+			(from.edge == right && to.edge == up) || (from.edge == up && to.edge == right) {
 			toPoints = reverse(toPoints)
 		}
 		for i, fromPoint := range fromPoints {

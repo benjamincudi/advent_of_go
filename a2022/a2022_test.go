@@ -578,7 +578,7 @@ func Test_day22(t *testing.T) {
 		cubePassword       int
 	}{
 		{"control case", mustOpen(t, "control22.txt"), 4, 6032, 5031},
-		{"personal input", mustOpen(t, "day22.txt"), 50, 93226, 5031},
+		{"personal input", mustOpen(t, "day22.txt"), 50, 93226, 37415},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
