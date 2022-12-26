@@ -66,12 +66,17 @@ func (p *wrappingGridPoint) walk(facing walkDirection) image.Point {
 	}
 }
 
+type faceEdge struct {
+	face int
+	edge walkDirection
+}
+
 const (
 	clockwise        string = "R" // also "down" for voids
 	counterClockwise string = "L" // also "up" for voids
 )
 
-func day22(in io.Reader, gridSize int) (int, int) {
+func day22(in io.Reader, gridSize int, cubeEdgeRemapper map[faceEdge]faceEdge) (int, int) {
 	allDirections := regexp.MustCompile(`[LR]`)
 
 	scanner := bufio.NewScanner(in)
@@ -225,10 +230,6 @@ func day22(in io.Reader, gridSize int) (int, int) {
 	}
 	part1 := (1000 * (walker.Y + 1)) + (4 * (walker.X + 1)) + int(facing)
 
-	type faceEdge struct {
-		face int
-		edge walkDirection
-	}
 	faceTopLeft := map[int]image.Point{}
 	for y, row := range faceGrid {
 		for x, face := range row {
@@ -238,42 +239,9 @@ func day22(in io.Reader, gridSize int) (int, int) {
 		}
 	}
 
-	// todo: this should be derivable from faceGrid
-	magicRemap := map[faceEdge]faceEdge{
-		// control input
-		//{1, left}:  {3, up},
-		//{1, up}:    {2, up},
-		//{1, right}: {6, right},
-		//{3, down}:  {5, left},
-		//{4, right}: {6, up},
-		//{2, down}:  {5, down},
-		//{2, left}:  {6, down},
-		// personal input
-		{2, down}:  {3, right},
-		{3, left}:  {4, up},
-		{5, down}:  {6, right},
-		{1, left}:  {4, left},
-		{5, right}: {2, right},
-		{1, up}:    {6, left},
-		{2, up}:    {6, down},
-	}
-	reverseMagicRemap := map[faceEdge]faceEdge{
-		// control input
-		//{3, up}:    {1, left},
-		//{2, up}:    {1, up},
-		//{6, right}: {1, right},
-		//{5, left}:  {3, down},
-		//{6, up}:    {4, right},
-		//{5, down}:  {2, down},
-		//{6, down}:  {2, left},
-		// personal input
-		{3, right}: {2, down},
-		{4, up}:    {3, left},
-		{6, right}: {5, down},
-		{4, left}:  {1, left},
-		{2, right}: {5, right},
-		{6, left}:  {1, up},
-		{6, down}:  {2, up},
+	reverseCubeEdgeRemap := map[faceEdge]faceEdge{}
+	for k, v := range cubeEdgeRemapper {
+		reverseCubeEdgeRemap[v] = k
 	}
 	getEdgeFromFace := func(face int, edge walkDirection) []*wrappingGridPoint {
 		topLeft := faceTopLeft[face]
@@ -286,7 +254,7 @@ func day22(in io.Reader, gridSize int) (int, int) {
 			})
 		}
 	}
-	for from, to := range magicRemap {
+	for from, to := range cubeEdgeRemapper {
 		fromPoints := getEdgeFromFace(from.face, from.edge)
 		toPoints := getEdgeFromFace(to.face, to.edge)
 		if (from.edge == to.edge) ||
@@ -317,9 +285,9 @@ func day22(in io.Reader, gridSize int) (int, int) {
 		for i := 0; i < d; i++ {
 			walker = grid[walker.Y][walker.X].walk(facing)
 			if grid[walker.Y][walker.X].faceNumber != fromFace.face {
-				to, hasRemap := magicRemap[fromFace]
+				to, hasRemap := cubeEdgeRemapper[fromFace]
 				if !hasRemap {
-					to, hasRemap = reverseMagicRemap[fromFace]
+					to, hasRemap = reverseCubeEdgeRemap[fromFace]
 					if !hasRemap {
 						fromFace.face = grid[walker.Y][walker.X].faceNumber
 						// edges were connected by adjacency

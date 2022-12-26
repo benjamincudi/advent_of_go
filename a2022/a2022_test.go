@@ -571,18 +571,40 @@ func Test_day21(t *testing.T) {
 }
 
 func Test_day22(t *testing.T) {
+	// control input
+	controlEdgeRemap := map[faceEdge]faceEdge{
+		{1, left}:  {3, up},
+		{1, up}:    {2, up},
+		{1, right}: {6, right},
+		{3, down}:  {5, left},
+		{4, right}: {6, up},
+		{2, down}:  {5, down},
+		{2, left}:  {6, down},
+	}
+	// personal input
+	personalEdgeRemap := map[faceEdge]faceEdge{
+		{2, down}:  {3, right},
+		{3, left}:  {4, up},
+		{5, down}:  {6, right},
+		{1, left}:  {4, left},
+		{5, right}: {2, right},
+		{1, up}:    {6, left},
+		{2, up}:    {6, down},
+	}
+
 	testCases := []struct {
 		name               string
 		in                 io.Reader
+		cubeEdgeRemapper   map[faceEdge]faceEdge
 		gridSize, password int
 		cubePassword       int
 	}{
-		{"control case", mustOpen(t, "control22.txt"), 4, 6032, 5031},
-		{"personal input", mustOpen(t, "day22.txt"), 50, 93226, 37415},
+		{"control case", mustOpen(t, "control22.txt"), controlEdgeRemap, 4, 6032, 5031},
+		{"personal input", mustOpen(t, "day22.txt"), personalEdgeRemap, 50, 93226, 37415},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			password, cubePassword := day22(tc.in, tc.gridSize)
+			password, cubePassword := day22(tc.in, tc.gridSize, tc.cubeEdgeRemapper)
 			if password != tc.password {
 				t.Errorf("expected password %v, got %v", tc.password, password)
 			}
