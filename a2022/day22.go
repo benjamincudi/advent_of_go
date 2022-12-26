@@ -326,7 +326,10 @@ func day22(in io.Reader, gridSize int) (int, int) {
 						continue
 					}
 				}
-				facing = (to.edge + 2) % 4
+				facing = map[walkDirection]walkDirection{
+					right: left, left: right,
+					up: down, down: up,
+				}[to.edge]
 				fromFace = to
 			}
 		}
