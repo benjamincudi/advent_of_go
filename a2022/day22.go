@@ -2,7 +2,6 @@ package a2022
 
 import (
 	"bufio"
-	"fmt"
 	"image"
 	"io"
 	"regexp"
@@ -71,34 +70,6 @@ const (
 	clockwise        string = "R" // also "down" for voids
 	counterClockwise string = "L" // also "up" for voids
 )
-
-type edgePair struct{ from, to int }
-
-var foldedEdgeMap = map[edgePair]struct {
-	direction string
-	magnitude int
-}{
-	{1, 6}: {clockwise, 2},
-	{1, 3}: {counterClockwise, 1},
-	{1, 2}: {counterClockwise, 2},
-	{1, 4}: {clockwise, 0},
-	{2, 1}: {counterClockwise, 2},
-	{2, 6}: {counterClockwise, 1},
-	{2, 5}: {clockwise, 2},
-	{2, 3}: {clockwise, 0},
-	{3, 1}: {clockwise, 1},
-	{3, 2}: {counterClockwise, 0},
-	{3, 5}: {counterClockwise, 1},
-	{3, 4}: {clockwise, 0},
-	{4, 1}: {clockwise, 0},
-	{4, 3}: {counterClockwise, 0},
-	{4, 5}: {counterClockwise, 0},
-	{4, 6}: {clockwise, 1},
-	{5, 4}: {clockwise, 0},
-	{5, 3}: {counterClockwise, 1},
-	{5, 2}: {counterClockwise, 2},
-	{5, 1}: {},
-}
 
 func day22(in io.Reader, gridSize int) (int, int) {
 	allDirections := regexp.MustCompile(`[LR]`)
@@ -258,30 +229,6 @@ func day22(in io.Reader, gridSize int) (int, int) {
 		face int
 		edge walkDirection
 	}
-	//edgeRemapped := map[faceEdge]bool{}
-	//for y, row := range faceGrid {
-	//	for x, face := range row {
-	//		if face == 0 {
-	//			continue
-	//		}
-	//		// init all as false so map is always complete
-	//		for _, dir := range []walkDirection{up, down, left, right} {
-	//			edgeRemapped[faceEdge{face, dir}] = false
-	//		}
-	//		if x > 0 {
-	//			edgeRemapped[faceEdge{face, left}] = faceGrid[y][x-1] > 0
-	//		}
-	//		if x < len(faceGrid[y])-1 {
-	//			edgeRemapped[faceEdge{face, right}] = faceGrid[y][x+1] > 0
-	//		}
-	//		if y > 0 {
-	//			edgeRemapped[faceEdge{face, up}] = faceGrid[y-1][x] > 0
-	//		}
-	//		if y < len(faceGrid)-1 {
-	//			edgeRemapped[faceEdge{face, down}] = faceGrid[y+1][x-1] > 0
-	//		}
-	//	}
-	//}
 	faceTopLeft := map[int]image.Point{}
 	for y, row := range faceGrid {
 		for x, face := range row {
@@ -301,6 +248,7 @@ func day22(in io.Reader, gridSize int) (int, int) {
 		//{4, right}: {6, up},
 		//{2, down}:  {5, down},
 		//{2, left}:  {6, down},
+		// personal input
 		{2, down}:  {3, right},
 		{3, left}:  {4, up},
 		{5, down}:  {6, right},
@@ -318,6 +266,7 @@ func day22(in io.Reader, gridSize int) (int, int) {
 		//{6, up}:    {4, right},
 		//{5, down}:  {2, down},
 		//{6, down}:  {2, left},
+		// personal input
 		{3, right}: {2, down},
 		{4, up}:    {3, left},
 		{6, right}: {5, down},
@@ -372,115 +321,26 @@ func day22(in io.Reader, gridSize int) (int, int) {
 				if !hasRemap {
 					to, hasRemap = reverseMagicRemap[fromFace]
 					if !hasRemap {
-						fmt.Printf("walked from face %d to face %d\n", fromFace.face, grid[walker.Y][walker.X].faceNumber)
 						fromFace.face = grid[walker.Y][walker.X].faceNumber
 						// edges were connected by adjacency
 						continue
 					}
 				}
 				facing = (to.edge + 2) % 4
-				fmt.Printf("walked from face %d to face %d, now looking %s\n", fromFace.face, to.face, facing)
-				fmt.Printf("walker arrived at %v\n", walker.Add(image.Pt(1, 1)))
 				fromFace = to
 			}
 		}
 	}
-	fmt.Printf("starting from %v facing %s\n", walker, facing)
+
 	// re-walk the grid
 	for i, steps := range distances {
-		fmt.Printf("walking %d steps\n", steps)
 		walkStepsCube(steps)
-		fmt.Printf("now at %v\n", walker.Add(image.Pt(1, 1)))
 		if i < len(turns) {
-			fmt.Printf("turning %s\n", turns[i])
 			changeFacing(turns[i])
-			fmt.Printf("now facing %s\n", facing)
 		}
 	}
-	//fmt.Printf("ended facing %s (%d) at %v\n", facing, facing, walker)
+
 	part2 := (1000 * (walker.Y + 1)) + (4 * (walker.X + 1)) + int(facing)
 
 	return part1, part2
 }
-
-/**
-part 2:
-if filter(nonEmpty) / 50 > 0
-	we have N+1 faces present
-assign cubeFace:
-	cubeRow = y / 50
-	cubeFace = (nonEmpty X / 50 + completed faces)
-completedFaces, maxFaces
-	rowFaces = (grid[y] / 50) + 1
-	if rowFaces != maxFaces
-		completedFaces += maxFaces
-		maxFaces = rowFaces
-
-folding: yikes. probably some trick here with a mini grid representing the cube faces
-	1 opp 5
-	3 opp 6
-	2 opp 4
-
-if you want <-> into void:
-	y%50 -> x offset on destination
-	aElseB(newFacing == down, 0, 49) -> y offset on destination
-
-	wrap into same row - e.g 2 walks into the same void above 6 in control
-	check above and below - only max one can be occupied, that's where you end up
-		iterate until you find a face
-			2 walking up: right (or left) twice = 1, going
-			2 walking down: right empty, left once = 6, going "up" 6 from the bottom
-		rotateDirection := aElseB(
-			above,
-			aElseB(facing == left, clockwise, counterClockwise),
-			aElseB(facing == left, counterClockwise, clockwise),
-		)
-		i*()
-{2,down}:{3,right}
-{3,left}:{4,up}
-{5,down}:{6,right}
-{1,left}:{4,left}
-{5,right}:{2,right}
-{1,up}:{6,left}
-{2,up}:{6,down}
-.12
-.3.
-45.
-6..
-
-direct:
-1->2
-1-v3
-3-v5
-4->5
-4-v6
-
-indirect, 1:
-2-v3(r)
-4-^3(l)
-5-v6(r)
-
-indirect, 2
-1->4(l)
-2-v5(r)
-
-
-..1.
-234.
-..56
-
-direct: 5
-close: 3
-1->3 (1cc,3c)
-3->5 (3cc,5c)
-4->6 (4c,6cc)
-
-2->6 (2cc,6c?)
-
-far:4
-2->1
-2->5
-1->6
-2->6
-
-*/
