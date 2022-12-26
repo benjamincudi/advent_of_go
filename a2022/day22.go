@@ -53,7 +53,7 @@ const (
 	up
 )
 
-func (p wrappingGridPoint) walk(facing walkDirection) image.Point {
+func (p *wrappingGridPoint) walk(facing walkDirection) image.Point {
 	switch facing {
 	case right:
 		return aElseB(p.right.isOpen, p.right.p, p.p)
