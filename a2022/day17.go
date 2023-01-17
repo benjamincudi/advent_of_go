@@ -3,6 +3,7 @@ package a2022
 import (
 	"bufio"
 	"fmt"
+	"image"
 	"io"
 	"strings"
 )
@@ -11,7 +12,7 @@ type tetrisShape interface {
 	getHeight() int
 	maybeWind(wind int, g tetrisGrid)
 	maybeFall(g tetrisGrid) bool
-	stopFalling() []coordinates
+	stopFalling() []image.Point
 }
 
 type tetrisGrid struct {
@@ -28,7 +29,7 @@ func (tg *tetrisGrid) addRows(height int) {
 	}
 }
 
-func (tg *tetrisGrid) isOpen(p coordinates) bool {
+func (tg *tetrisGrid) isOpen(p image.Point) bool {
 	if p.X < 0 || p.X > 6 || p.Y < 0 {
 		return false
 	}
@@ -40,7 +41,7 @@ func (tg *tetrisGrid) isOpen(p coordinates) bool {
 
 func (tg *tetrisGrid) recordBlocks(s tetrisShape) {
 	points := s.stopFalling()
-	reqHeight := maxInt(mapValue(points, func(p coordinates) int { return p.Y })...)
+	reqHeight := maxInt(mapValue(points, func(p image.Point) int { return p.Y })...)
 	if reqHeight+1 > tg.getHeight() {
 		tg.addRows(reqHeight - tg.getHeight() + 1)
 	}
@@ -132,48 +133,48 @@ func day17(in io.Reader) (int, int) {
 }
 
 type tetrisLine struct {
-	leftBlock coordinates
+	leftBlock image.Point
 }
 
 func makeTetrisLine(gridHeight int) tetrisShape {
-	return &tetrisLine{coordinates{2, gridHeight + 3}}
+	return &tetrisLine{image.Pt(2, gridHeight+3)}
 }
 
 func (tl *tetrisLine) getHeight() int { return 1 }
 func (tl *tetrisLine) maybeWind(wind int, tg tetrisGrid) {
-	if tg.isOpen(aElseB(wind == -1, coordinates{tl.leftBlock.X - 1, tl.leftBlock.Y}, coordinates{tl.leftBlock.X + 4, tl.leftBlock.Y})) {
+	if tg.isOpen(aElseB(wind == -1, image.Pt(tl.leftBlock.X-1, tl.leftBlock.Y), image.Pt(tl.leftBlock.X+4, tl.leftBlock.Y))) {
 		tl.leftBlock.X += wind
 	}
 }
 func (tl *tetrisLine) maybeFall(tg tetrisGrid) bool {
 	for x := 0; x < 4; x++ {
-		if !tg.isOpen(coordinates{tl.leftBlock.X + x, tl.leftBlock.Y - 1}) {
+		if !tg.isOpen(image.Pt(tl.leftBlock.X+x, tl.leftBlock.Y-1)) {
 			return false
 		}
 	}
 	tl.leftBlock.Y -= 1
 	return true
 }
-func (tl *tetrisLine) stopFalling() []coordinates {
-	points := make([]coordinates, 4)
+func (tl *tetrisLine) stopFalling() []image.Point {
+	points := make([]image.Point, 4)
 	for x := 0; x < 4; x++ {
-		points[x] = coordinates{tl.leftBlock.X + x, tl.leftBlock.Y}
+		points[x] = image.Pt(tl.leftBlock.X+x, tl.leftBlock.Y)
 	}
 	return points
 }
 
 type tetrisCol struct {
-	bottomBlock coordinates
+	bottomBlock image.Point
 }
 
 func makeTetrisCol(gridHeight int) tetrisShape {
-	return &tetrisCol{coordinates{2, gridHeight + 3}}
+	return &tetrisCol{image.Pt(2, gridHeight+3)}
 }
 
 func (tl *tetrisCol) getHeight() int { return 4 }
 func (tl *tetrisCol) maybeWind(wind int, tg tetrisGrid) {
 	for y := 0; y < 4; y++ {
-		if !tg.isOpen(coordinates{tl.bottomBlock.X + wind, tl.bottomBlock.Y + y}) {
+		if !tg.isOpen(image.Pt(tl.bottomBlock.X+wind, tl.bottomBlock.Y+y)) {
 			return
 		}
 	}
@@ -183,33 +184,33 @@ func (tl *tetrisCol) maybeFall(tg tetrisGrid) bool {
 	if tl.bottomBlock.Y == 0 {
 		return false
 	}
-	if !tg.isOpen(coordinates{tl.bottomBlock.X, tl.bottomBlock.Y - 1}) {
+	if !tg.isOpen(image.Pt(tl.bottomBlock.X, tl.bottomBlock.Y-1)) {
 		return false
 	}
 	tl.bottomBlock.Y -= 1
 	return true
 }
-func (tl *tetrisCol) stopFalling() []coordinates {
-	points := make([]coordinates, 4)
+func (tl *tetrisCol) stopFalling() []image.Point {
+	points := make([]image.Point, 4)
 	for y := 0; y < 4; y++ {
-		points[y] = coordinates{tl.bottomBlock.X, tl.bottomBlock.Y + y}
+		points[y] = image.Pt(tl.bottomBlock.X, tl.bottomBlock.Y+y)
 	}
 	return points
 }
 
 type tetrisSquare struct {
-	bottomLeftBlock coordinates
+	bottomLeftBlock image.Point
 }
 
 func makeTetrisSquare(gridHeight int) tetrisShape {
-	return &tetrisSquare{coordinates{2, gridHeight + 3}}
+	return &tetrisSquare{image.Pt(2, gridHeight+3)}
 }
 
 func (tl *tetrisSquare) getHeight() int { return 2 }
 func (tl *tetrisSquare) maybeWind(wind int, tg tetrisGrid) {
 	edge := aElseB(sign(wind) == -1, 0, 1)
 	for y := 0; y < 2; y++ {
-		if !tg.isOpen(coordinates{tl.bottomLeftBlock.X + edge + wind, tl.bottomLeftBlock.Y + y}) {
+		if !tg.isOpen(image.Pt(tl.bottomLeftBlock.X+edge+wind, tl.bottomLeftBlock.Y+y)) {
 			return
 		}
 	}
@@ -220,35 +221,35 @@ func (tl *tetrisSquare) maybeFall(tg tetrisGrid) bool {
 		return false
 	}
 	for x := 0; x < 2; x++ {
-		if !tg.isOpen(coordinates{tl.bottomLeftBlock.X + x, tl.bottomLeftBlock.Y - 1}) {
+		if !tg.isOpen(image.Pt(tl.bottomLeftBlock.X+x, tl.bottomLeftBlock.Y-1)) {
 			return false
 		}
 	}
 	tl.bottomLeftBlock.Y -= 1
 	return true
 }
-func (tl *tetrisSquare) stopFalling() []coordinates {
-	points := make([]coordinates, 4)
+func (tl *tetrisSquare) stopFalling() []image.Point {
+	points := make([]image.Point, 4)
 	for y := 0; y < 2; y++ {
-		points[2*y] = coordinates{tl.bottomLeftBlock.X, tl.bottomLeftBlock.Y + y}
-		points[2*y+1] = coordinates{tl.bottomLeftBlock.X + 1, tl.bottomLeftBlock.Y + y}
+		points[2*y] = image.Pt(tl.bottomLeftBlock.X, tl.bottomLeftBlock.Y+y)
+		points[2*y+1] = image.Pt(tl.bottomLeftBlock.X+1, tl.bottomLeftBlock.Y+y)
 	}
 	return points
 }
 
 // The backwards L whose arm is too long
 type tetrisCorner struct {
-	bottomLeftBlock coordinates
+	bottomLeftBlock image.Point
 }
 
 func makeTetrisCorner(gridHeight int) tetrisShape {
-	return &tetrisCorner{coordinates{2, gridHeight + 3}}
+	return &tetrisCorner{image.Pt(2, gridHeight+3)}
 }
 
 func (tl *tetrisCorner) getHeight() int { return 3 }
 func (tl *tetrisCorner) maybeWind(wind int, tg tetrisGrid) {
 	for y := 0; y < 3; y++ {
-		dest := coordinates{tl.bottomLeftBlock.X + aElseB(y == 0 && wind == -1, 0, 2) + wind, tl.bottomLeftBlock.Y + y}
+		dest := image.Pt(tl.bottomLeftBlock.X+aElseB(y == 0 && wind == -1, 0, 2)+wind, tl.bottomLeftBlock.Y+y)
 		if !tg.isOpen(dest) {
 			return
 		}
@@ -257,7 +258,7 @@ func (tl *tetrisCorner) maybeWind(wind int, tg tetrisGrid) {
 }
 func (tl *tetrisCorner) maybeFall(tg tetrisGrid) bool {
 	for x := 0; x < 3; x++ {
-		dest := coordinates{tl.bottomLeftBlock.X + x, tl.bottomLeftBlock.Y - 1}
+		dest := image.Pt(tl.bottomLeftBlock.X+x, tl.bottomLeftBlock.Y-1)
 		if !tg.isOpen(dest) {
 			return false
 		}
@@ -265,24 +266,24 @@ func (tl *tetrisCorner) maybeFall(tg tetrisGrid) bool {
 	tl.bottomLeftBlock.Y -= 1
 	return true
 }
-func (tl *tetrisCorner) stopFalling() []coordinates {
-	points := make([]coordinates, 5)
+func (tl *tetrisCorner) stopFalling() []image.Point {
+	points := make([]image.Point, 5)
 	for x := 0; x < 3; x++ {
-		points[x] = coordinates{tl.bottomLeftBlock.X + x, tl.bottomLeftBlock.Y}
+		points[x] = image.Pt(tl.bottomLeftBlock.X+x, tl.bottomLeftBlock.Y)
 	}
 	for y := 1; y < 3; y++ {
-		points[y+2] = coordinates{tl.bottomLeftBlock.X + 2, tl.bottomLeftBlock.Y + y}
+		points[y+2] = image.Pt(tl.bottomLeftBlock.X+2, tl.bottomLeftBlock.Y+y)
 	}
 	return points
 }
 
 type tetrisPlus struct {
-	bottomBlock coordinates
+	bottomBlock image.Point
 }
 
 func makeTetrisPlus(gridHeight int) tetrisShape {
 	// offset X by 1 more, we can't be in the bottom left here
-	return &tetrisPlus{coordinates{3, gridHeight + 3}}
+	return &tetrisPlus{image.Pt(3, gridHeight+3)}
 }
 
 func (tl *tetrisPlus) getHeight() int { return 3 }
@@ -290,7 +291,7 @@ func (tl *tetrisPlus) maybeWind(wind int, tg tetrisGrid) {
 	for y := 0; y < 3; y++ {
 		// X for top and bottom block are equal
 		// X for center row is +- 1 from this, in the same direction as the wind
-		dest := coordinates{tl.bottomBlock.X + aElseB(y == 1, wind, 0) + wind, tl.bottomBlock.Y + y}
+		dest := image.Pt(tl.bottomBlock.X+aElseB(y == 1, wind, 0)+wind, tl.bottomBlock.Y+y)
 		if !tg.isOpen(dest) {
 			return
 		}
@@ -301,7 +302,7 @@ func (tl *tetrisPlus) maybeFall(tg tetrisGrid) bool {
 	for x := -1; x < 2; x++ {
 		// The bottom (center) block needs to check 1 space below it's level
 		// Either side needs to check the same level the bottom block is already on
-		dest := coordinates{tl.bottomBlock.X + x, tl.bottomBlock.Y - aElseB(x == 0, 1, 0)}
+		dest := image.Pt(tl.bottomBlock.X+x, tl.bottomBlock.Y-aElseB(x == 0, 1, 0))
 		if !tg.isOpen(dest) {
 			return false
 		}
@@ -309,12 +310,12 @@ func (tl *tetrisPlus) maybeFall(tg tetrisGrid) bool {
 	tl.bottomBlock.Y -= 1
 	return true
 }
-func (tl *tetrisPlus) stopFalling() []coordinates {
-	points := make([]coordinates, 5)
+func (tl *tetrisPlus) stopFalling() []image.Point {
+	points := make([]image.Point, 5)
 	for x := -1; x < 2; x++ {
-		points[x+1] = coordinates{tl.bottomBlock.X + x, tl.bottomBlock.Y + 1}
+		points[x+1] = image.Pt(tl.bottomBlock.X+x, tl.bottomBlock.Y+1)
 	}
 	points[3] = tl.bottomBlock
-	points[4] = coordinates{tl.bottomBlock.X, tl.bottomBlock.Y + 2}
+	points[4] = image.Pt(tl.bottomBlock.X, tl.bottomBlock.Y+2)
 	return points
 }

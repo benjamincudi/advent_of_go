@@ -3,13 +3,14 @@ package a2022
 import (
 	"bufio"
 	"fmt"
+	"image"
 	"io"
 	"sort"
 	"strings"
 )
 
 type sensorBeaconPairing struct {
-	S, B         coordinates
+	S, B         image.Point
 	taxiDistance int
 }
 
@@ -113,7 +114,7 @@ func day15(in io.Reader, targetRow, upperBounds int) (int, int) {
 			return mustInt(strings.TrimRight(strings.Split(s, "=")[1], ":,"))
 		})
 		dTotal := abs(vals[0]-vals[2]) + abs(vals[1]-vals[3])
-		pairs = append(pairs, sensorBeaconPairing{coordinates{vals[0], vals[1]}, coordinates{vals[2], vals[3]}, dTotal})
+		pairs = append(pairs, sensorBeaconPairing{image.Pt(vals[0], vals[1]), image.Pt(vals[2], vals[3]), dTotal})
 	}
 
 	// part 1

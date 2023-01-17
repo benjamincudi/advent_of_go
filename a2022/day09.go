@@ -3,36 +3,24 @@ package a2022
 import (
 	"encoding/csv"
 	"errors"
+	"image"
 	"io"
-	"strings"
 
 	"github.com/gocarina/gocsv"
 )
 
-type coordinates struct{ X, Y int }
-
-func (c *coordinates) UnmarshalString(s string) error {
-	parts := strings.Split(s, ",")
-	c.X, c.Y = mustInt(parts[0]), mustInt(parts[1])
-	return nil
-}
-
-// vector represents the amount a ropeKnot will move
-// it aliases coordinates for convenience as I am lazy
-type vector coordinates
-
 // a basicDirection corresponds to one of four preset vectors
 // this makes moving the head knot super simple
-var letterToVector = map[string]vector{
-	"U": {0, 1}, "L": {-1, 0},
-	"D": {0, -1}, "R": {1, 0},
+var letterToVector = map[string]image.Point{
+	"U": image.Pt(0, 1), "L": image.Pt(-1, 0),
+	"D": image.Pt(0, -1), "R": image.Pt(1, 0),
 }
 
 // basicDirection adds very minimal safety to ropeInstruction parsing
 //
 // input is very constraints so this doesn't really guard against much,
 // but it does let us translate to a vector on the way in
-type basicDirection struct{ vec vector }
+type basicDirection struct{ vec image.Point }
 
 func (d *basicDirection) UnmarshalCSV(s string) error {
 	if vec, ok := letterToVector[s]; !ok {
@@ -49,8 +37,8 @@ type ropeInstruction struct {
 }
 
 type ropeKnot struct {
-	position coordinates
-	history  map[coordinates]bool
+	position image.Point
+	history  map[image.Point]bool
 	tail     *ropeKnot
 }
 
@@ -58,29 +46,29 @@ func makeRopeKnot(i, count int) *ropeKnot {
 	if i == count {
 		return nil
 	}
-	return &ropeKnot{coordinates{0, 0}, map[coordinates]bool{coordinates{0, 0}: true}, makeRopeKnot(i+1, count)}
+	return &ropeKnot{image.Pt(0, 0), map[image.Point]bool{image.Pt(0, 0): true}, makeRopeKnot(i+1, count)}
 }
 
 func (r *ropeKnot) move(d basicDirection) {
-	r.position = coordinates{r.position.X + d.vec.X, r.position.Y + d.vec.Y}
+	r.position = image.Pt(r.position.X+d.vec.X, r.position.Y+d.vec.Y)
 	r.history[r.position] = true
 	r.tail.follow(r.position)
 }
 
 // knotPair only used to disambiguate head and tail inputs for getMoveVector
-type knotPair struct{ head, tail coordinates }
+type knotPair struct{ head, tail image.Point }
 
-func getMoveVector(kp knotPair) vector {
+func getMoveVector(kp knotPair) image.Point {
 	deltaX, deltaY := kp.head.X-kp.tail.X, kp.head.Y-kp.tail.Y
 	if abs(deltaX) == 2 || abs(deltaY) == 2 {
-		return vector{sign(deltaX), sign(deltaY)}
+		return image.Pt(sign(deltaX), sign(deltaY))
 	}
-	return vector{0, 0}
+	return image.Pt(0, 0)
 }
 
-func (r *ropeKnot) follow(head coordinates) {
+func (r *ropeKnot) follow(head image.Point) {
 	moveVec := getMoveVector(knotPair{head, r.position})
-	r.position = coordinates{r.position.X + moveVec.X, r.position.Y + moveVec.Y}
+	r.position = image.Pt(r.position.X+moveVec.X, r.position.Y+moveVec.Y)
 	r.history[r.position] = true
 	if r.tail != nil {
 		r.tail.follow(r.position)

@@ -3,24 +3,26 @@ package a2022
 import (
 	"bufio"
 	"fmt"
+	"image"
 	"io"
 	"strings"
 )
 
+func pointFromString(s string) image.Point {
+	parts := strings.Split(s, ",")
+	return image.Pt(mustInt(parts[0]), mustInt(parts[1]))
+}
+
 func day14(in io.Reader) (int, int) {
 	scanner := bufio.NewScanner(in)
-	var rockLines [][]coordinates
+	var rockLines [][]image.Point
 	minX, maxX, maxY := 1000, 0, 0
 	for scanner.Scan() {
 		rockLines = append(
 			rockLines,
-			mapValue(strings.Split(scanner.Text(), " -> "), func(s string) coordinates {
-				var c coordinates
-				if err := c.UnmarshalString(s); err != nil {
-					fmt.Printf("unexpected error: %v\n", err)
-				} else {
-					minX, maxX, maxY = minInt(minX, c.X), maxInt(maxX, c.X), maxInt(maxY, c.Y)
-				}
+			mapValue(strings.Split(scanner.Text(), " -> "), func(s string) image.Point {
+				c := pointFromString(s)
+				minX, maxX, maxY = minInt(minX, c.X), maxInt(maxX, c.X), maxInt(maxY, c.Y)
 				return c
 			}),
 		)
@@ -37,7 +39,7 @@ func day14(in io.Reader) (int, int) {
 	}
 
 	for _, line := range rockLines {
-		var from *coordinates
+		var from *image.Point
 		for _, to := range line {
 			if from != nil {
 				dX, dY := sign(to.X-from.X), sign(to.Y-from.Y)
@@ -53,7 +55,7 @@ func day14(in io.Reader) (int, int) {
 		}
 	}
 
-	canDrop := func(c coordinates) (dX int, falls bool) {
+	canDrop := func(c image.Point) (dX int, falls bool) {
 		if c.Y+1 == maxY {
 			return 0, false
 		}
@@ -68,7 +70,7 @@ func day14(in io.Reader) (int, int) {
 	sandUnits := 0
 sandDrop:
 	for {
-		start := coordinates{500, 0}
+		start := image.Pt(500, 0)
 		for dX, falls := canDrop(start); falls; dX, falls = canDrop(start) {
 			start.X, start.Y = start.X+dX, start.Y+1
 			// pretend there's an abyss instead of the floor
@@ -91,7 +93,7 @@ sandDrop:
 
 	withFloor := sandUnits
 	for {
-		start := coordinates{500, 0}
+		start := image.Pt(500, 0)
 		for dX, falls := canDrop(start); falls; dX, falls = canDrop(start) {
 			start.X, start.Y = start.X+dX, start.Y+1
 		}

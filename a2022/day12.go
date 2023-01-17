@@ -3,6 +3,7 @@ package a2022
 import (
 	"bufio"
 	"fmt"
+	"image"
 	"io"
 	"sort"
 	"strings"
@@ -20,27 +21,27 @@ func letterToInt(letter string) int {
 }
 
 // used while filling out the node scores, in descending score/search
-func getValidVisitors(grid [][]int, p coordinates) []coordinates {
+func getValidVisitors(grid [][]int, p image.Point) []image.Point {
 	minNext := grid[p.Y][p.X] - 1
 
-	var neighbors []coordinates
+	var neighbors []image.Point
 	if p.X > 0 && grid[p.Y][p.X-1] >= minNext {
-		neighbors = append(neighbors, coordinates{p.X - 1, p.Y})
+		neighbors = append(neighbors, image.Pt(p.X-1, p.Y))
 	}
 	if p.Y > 0 && grid[p.Y-1][p.X] >= minNext {
-		neighbors = append(neighbors, coordinates{p.X, p.Y - 1})
+		neighbors = append(neighbors, image.Pt(p.X, p.Y-1))
 	}
 	if p.X < len(grid[p.Y])-1 && grid[p.Y][p.X+1] >= minNext {
-		neighbors = append(neighbors, coordinates{p.X + 1, p.Y})
+		neighbors = append(neighbors, image.Pt(p.X+1, p.Y))
 	}
 	if p.Y < len(grid)-1 && grid[p.Y+1][p.X] >= minNext {
-		neighbors = append(neighbors, coordinates{p.X, p.Y + 1})
+		neighbors = append(neighbors, image.Pt(p.X, p.Y+1))
 	}
 	return neighbors
 }
 
 type pathNode struct {
-	pos           coordinates
+	pos           image.Point
 	height, score int
 	neighbors     []*pathNode
 }
@@ -58,8 +59,8 @@ func (p *pathNode) addNeighbor(n *pathNode) {
 func day12(in io.Reader) (int, int) {
 	s := bufio.NewScanner(in)
 	var grid [][]int
-	start, end := coordinates{0, 0}, coordinates{0, 0}
-	var allStarts []coordinates
+	start, end := image.Pt(0, 0), image.Pt(0, 0)
+	var allStarts []image.Point
 	for s.Scan() {
 		row := s.Text()
 		rowI := len(grid)
@@ -68,12 +69,12 @@ func day12(in io.Reader) (int, int) {
 		for i, letter := range exploded {
 			switch letter {
 			case "S":
-				start = coordinates{i, rowI}
+				start = image.Pt(i, rowI)
 				allStarts = append(allStarts, start)
 			case "a":
-				allStarts = append(allStarts, coordinates{i, rowI})
+				allStarts = append(allStarts, image.Pt(i, rowI))
 			case "E":
-				end = coordinates{i, rowI}
+				end = image.Pt(i, rowI)
 			}
 		}
 
@@ -82,7 +83,7 @@ func day12(in io.Reader) (int, int) {
 
 	nodeGrid := mapValueWithIndex(grid, func(y int, row []int) []*pathNode {
 		return mapValueWithIndex(row, func(x, height int) *pathNode {
-			return &pathNode{coordinates{x, y}, height, -1, nil}
+			return &pathNode{image.Pt(x, y), height, -1, nil}
 		})
 	})
 
