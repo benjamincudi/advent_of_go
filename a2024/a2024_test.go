@@ -1,47 +1,34 @@
 package a2024
 
 import (
+	"fmt"
+	"io"
 	"testing"
 )
 
-func Test_day1(t *testing.T) {
-	f := mustOpen(t, "control-01.txt")
-	p1, p2 := day1(f)
-	if p1 != 11 || p2 != 31 {
-		t.Errorf("control should be 11, 31, was %d, %d", p1, p2)
+func testForDay(t *testing.T, day string, solver func(r io.Reader) (int, int), control1, control2, result1, result2 int) {
+	t.Helper()
+	f := mustOpen(t, fmt.Sprintf("control-%s.txt", day))
+	p1, p2 := solver(f)
+	if p1 != control1 || p2 != control2 {
+		t.Errorf("control should be %d, %d, was %d, %d", control1, control2, p1, p2)
 		t.FailNow()
 	}
-	f = mustOpen(t, "day-01.txt")
-	p1, p2 = day1(f)
-	if p1 != 2086478 || p2 != 24941624 {
-		t.Errorf("day1 is %d, %d", p1, p2)
+	f = mustOpen(t, fmt.Sprintf("day-%s.txt", day))
+	p1, p2 = solver(f)
+	if p1 != result1 || p2 != result2 {
+		t.Errorf("day%s is %d, %d", day, p1, p2)
 	}
+}
+
+func Test_day1(t *testing.T) {
+	testForDay(t, "01", day1, 11, 31, 2086478, 24941624)
 }
 
 func Test_day2(t *testing.T) {
-	f := mustOpen(t, "control-02.txt")
-	p1, p2 := day2(f)
-	if p1 != 2 || p2 != 4 {
-		t.Errorf("control should be 2, 4, was %d, %d", p1, p2)
-		t.FailNow()
-	}
-	f = mustOpen(t, "day-02.txt")
-	p1, p2 = day2(f)
-	if p1 != 680 || p2 != 710 {
-		t.Errorf("day2 is %d, %d", p1, p2)
-	}
+	testForDay(t, "02", day2, 2, 4, 680, 710)
 }
 
 func Test_day3(t *testing.T) {
-	f := mustOpen(t, "control-03.txt")
-	p1, p2 := day3(f)
-	if p1 != 161 || p2 != 48 {
-		t.Errorf("control should be 161, 48, was %d, %d", p1, p2)
-		t.FailNow()
-	}
-	f = mustOpen(t, "day-03.txt")
-	p1, p2 = day3(f)
-	if p1 != 187833789 || p2 != 94455185 {
-		t.Errorf("day3 is %d, %d", p1, p2)
-	}
+	testForDay(t, "03", day3, 161, 48, 187833789, 94455185)
 }
