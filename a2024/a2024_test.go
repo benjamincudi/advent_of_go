@@ -21,14 +21,20 @@ func testForDay(t *testing.T, day string, solver func(r io.Reader) (int, int), c
 	}
 }
 
-func Test_day1(t *testing.T) {
-	testForDay(t, "01", day1, 11, 31, 2086478, 24941624)
-}
-
-func Test_day2(t *testing.T) {
-	testForDay(t, "02", day2, 2, 4, 680, 710)
-}
-
-func Test_day3(t *testing.T) {
-	testForDay(t, "03", day3, 161, 48, 187833789, 94455185)
+func Test_a2024(t *testing.T) {
+	tcs := []struct {
+		solver                               func(r io.Reader) (int, int)
+		control1, control2, result1, result2 int
+	}{
+		{day1, 11, 31, 2086478, 24941624},
+		{day2, 2, 4, 680, 710},
+		{day3, 161, 48, 187833789, 94455185},
+	}
+	for i, tc := range tcs {
+		prefix := aElseB(i < 9, "0", "")
+		day := fmt.Sprintf("%s%d", prefix, i+1)
+		t.Run(fmt.Sprintf("day %s", day), func(t *testing.T) {
+			testForDay(t, day, tc.solver, tc.control1, tc.control2, tc.result1, tc.result2)
+		})
+	}
 }
