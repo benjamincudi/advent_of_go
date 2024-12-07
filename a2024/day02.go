@@ -17,21 +17,38 @@ func day2(r io.Reader) (int, int) {
 		})
 		reports = append(reports, mapValue(parts, mustInt))
 	}
-	var safeReportCount int
+	var safeReportCount, dampenedSafeCount int
 	for _, report := range reports {
-		diffs := mapValueWithIndex(report, func(i int, e int) int {
-			if i == len(report)-1 {
-				return e - report[i-1] // repeat the previous calc
+		filtered, signs := processReport(report)
+		if len(filtered) == 0 && len(signs) == 1 {
+			safeReportCount += 1
+			dampenedSafeCount += 1
+			continue
+		}
+		for i := range report {
+			without := removeIndex(report, i)
+			filtered, signs = processReport(without)
+			if len(filtered) == 0 && len(signs) == 1 {
+				dampenedSafeCount += 1
+				break
 			}
-			return report[i+1] - e
-		})
-		filtered := filter(diffs, func(i int) bool {
-			return abs(i) > 3 || i == 0
-		})
-		signs := slices.Compact(mapValue(diffs, func(e int) int {
-			return sign(e)
-		}))
-		safeReportCount += aElseB(len(filtered) == 0 && len(signs) == 1, 1, 0)
+		}
 	}
-	return safeReportCount, 0
+	return safeReportCount, dampenedSafeCount
+}
+
+func processReport(report []int) ([]int, []int) {
+	diffs := mapValueWithIndex(report, func(i int, e int) int {
+		if i == len(report)-1 {
+			return e - report[i-1] // repeat the previous calc
+		}
+		return report[i+1] - e
+	})
+	filtered := filter(diffs, func(i int) bool {
+		return abs(i) > 3 || i == 0
+	})
+	signs := slices.Compact(mapValue(diffs, func(e int) int {
+		return sign(e)
+	}))
+	return filtered, signs
 }

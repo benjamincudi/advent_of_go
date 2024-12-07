@@ -21,13 +21,13 @@ func Test_day1(t *testing.T) {
 func Test_day2(t *testing.T) {
 	f := mustOpen(t, "control-02.txt")
 	p1, p2 := day2(f)
-	if p1 != 2 || p2 != 0 {
-		t.Errorf("control should be 2, 0, was %d, %d", p1, p2)
+	if p1 != 2 || p2 != 4 {
+		t.Errorf("control should be 2, 4, was %d, %d", p1, p2)
 		t.FailNow()
 	}
 	f = mustOpen(t, "day-02.txt")
 	p1, p2 = day2(f)
-	if p1 != 0 || p2 != 0 {
+	if p1 != 680 || p2 != 710 {
 		t.Errorf("day2 is %d, %d", p1, p2)
 	}
 }

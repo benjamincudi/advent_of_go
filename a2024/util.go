@@ -121,3 +121,14 @@ func mapValueWithIndex[E any, F any](in []E, getValue func(int, E) F) []F {
 	}
 	return ret
 }
+
+func removeIndex[E any](in []E, index int) []E {
+	ret := make([]E, 0, len(in)-1)
+	for i := range in {
+		if i == index {
+			continue
+		}
+		ret = append(ret, in[i])
+	}
+	return ret
+}
