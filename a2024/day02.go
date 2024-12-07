@@ -26,8 +26,7 @@ func day2(r io.Reader) (int, int) {
 			continue
 		}
 		for i := range report {
-			without := removeIndex(report, i)
-			filtered, signs = processReport(without)
+			filtered, signs = processReport(removeIndex(report, i))
 			if len(filtered) == 0 && len(signs) == 1 {
 				dampenedSafeCount += 1
 				break
