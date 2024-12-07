@@ -31,3 +31,17 @@ func Test_day2(t *testing.T) {
 		t.Errorf("day2 is %d, %d", p1, p2)
 	}
 }
+
+func Test_day3(t *testing.T) {
+	f := mustOpen(t, "control-03.txt")
+	p1, p2 := day3(f)
+	if p1 != 161 || p2 != 0 {
+		t.Errorf("control should be 161, 0, was %d, %d", p1, p2)
+		t.FailNow()
+	}
+	f = mustOpen(t, "day-03.txt")
+	p1, p2 = day3(f)
+	if p1 != 187833789 || p2 != 0 {
+		t.Errorf("day3 is %d, %d", p1, p2)
+	}
+}
