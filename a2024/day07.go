@@ -1,6 +1,7 @@
 package a2024
 
 import (
+	"fmt"
 	"io"
 	"regexp"
 )
@@ -18,17 +19,24 @@ func day7(r io.Reader) (int, int) {
 	})
 	sum := 0
 	for _, p := range problems {
-		sum += aElseB(solveMathDepth(p.answer, p.inputs), p.answer, 0)
+		sum += aElseB(solveMathDepth(p.answer, p.inputs, false), p.answer, 0)
 	}
-	return sum, 0
+	withConcat := 0
+	for _, p := range problems {
+		withConcat += aElseB(solveMathDepth(p.answer, p.inputs, true), p.answer, 0)
+	}
+	return sum, withConcat
 }
 
-func solveMathDepth(target int, values []int) bool {
+func solveMathDepth(target int, values []int, allowConcat bool) bool {
 	left, right, rest := values[0], values[1], values[2:]
 	sum := left + right
 	mult := left * right
+	concat := mustInt(fmt.Sprintf("%d%d", left, right))
 	if len(rest) == 0 {
-		return sum == target || mult == target
+		return sum == target || mult == target || (allowConcat && concat == target)
 	}
-	return solveMathDepth(target, append([]int{sum}, rest...)) || solveMathDepth(target, append([]int{mult}, rest...))
+	return solveMathDepth(target, append([]int{sum}, rest...), allowConcat) ||
+		solveMathDepth(target, append([]int{mult}, rest...), allowConcat) ||
+		(allowConcat && solveMathDepth(target, append([]int{concat}, rest...), allowConcat))
 }
