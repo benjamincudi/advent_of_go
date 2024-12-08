@@ -1,8 +1,10 @@
 package a2024
 
 import (
+	"bufio"
 	"embed"
 	"fmt"
+	"io"
 	"io/fs"
 	"sort"
 	"strconv"
@@ -25,6 +27,13 @@ func mustOpen(t failerHelper, name string) fs.File {
 		t.Fatalf("%v", err)
 	}
 	return inputReader
+}
+
+func mapFileLines(r io.Reader, fn func(text string)) {
+	scanner := bufio.NewScanner(r)
+	for scanner.Scan() {
+		fn(scanner.Text())
+	}
 }
 
 func mustInt(s string) int {
