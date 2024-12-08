@@ -30,6 +30,7 @@ func Test_a2024(t *testing.T) {
 		{day2, 2, 4, 680, 710},
 		{day3, 161, 48, 187833789, 94455185},
 		{day4, 18, 9, 2532, 1941},
+		{day5, 143, 0, 6612, 0},
 	}
 	for i, tc := range tcs {
 		prefix := aElseB(i < 9, "0", "")
