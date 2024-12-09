@@ -36,6 +36,10 @@ func mapFileLines(r io.Reader, fn func(text string)) {
 	}
 }
 
+func pointer[E any](v E) *E {
+	return &v
+}
+
 func mustInt(s string) int {
 	i, err := strconv.Atoi(s)
 	if err != nil {
